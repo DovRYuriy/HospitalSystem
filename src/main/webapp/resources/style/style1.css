@@ -1,0 +1,110 @@
+.container1 {
+    width: 1300px;
+    margin: 0 auto;
+    background: white;
+    padding-top: 50px;
+}
+
+.container1 h1 {
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+body {
+    background: #000;
+    margin: 0;
+    padding: 0;
+}
+
+nav {
+    width: 250px;
+    margin: 12.5px auto;
+}
+
+nav > form > input[type="submit"] {
+    width: 100%;
+    border: 2px solid #06CD06;
+    transition: background-color 1s 0s;
+    height: 50px;
+    margin: 12.5px auto;
+    background-color: white;
+    font-size: 14pt;
+}
+.regButton{
+    width: 250px;
+    border: 2px solid #06CD06;
+    transition: background-color 1s 0s;
+    height: 50px;
+    margin: 12.5px auto;
+    background-color: white;
+    font-size: 14pt;
+}
+
+nav > form > input[type="submit"]:hover {
+    background-color: #06CD06;
+}
+
+.container1 h2 {
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.container1 div {
+    text-align: center;
+}
+
+.container1 h3 {
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.container1 th {
+    background: #DCF5D9;
+}
+
+.container1 table {
+    width: 800px;
+    margin: 0 auto;
+    padding: 10px;
+    border-collapse: collapse;
+}
+
+.container1 table th {
+    padding: 10px;
+}
+
+.container1 table tr {
+    padding: 10px;
+    text-align: center;
+}
+
+.container1 table td {
+    padding: 10px;
+}
+.motherCountry{
+    position: relative;
+    width: 100%;
+    height: auto;
+}
+.countryBox {
+    width: 100px;
+    position: absolute;
+    top: 0;
+    right: 600px;
+}
+
+.error {
+    color: red;
+    font-size: 14pt;
+    width: 230px;
+    padding: 5px;
+    margin: 10px auto 0;
+}
+
+.errorRemove {
+    color: red;
+    font-size: 20pt;
+    width: 300px;
+    padding: 5px;
+    margin: 10px auto 0;
+}

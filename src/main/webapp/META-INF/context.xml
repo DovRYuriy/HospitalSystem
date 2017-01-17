@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Context>
+    <Resource
+            name="jdbc/hospital"
+            author="Container"
+            type="javax.sql.DataSource"
+            maxActive="32"
+            maxIdle="8"
+            maxWait="10000"
+            removeAbandonedTimeout="30"
+            removeAbandoned="true"
+            logAbandoned="true"
+            username="root"
+            password="root"
+            driverClassName="com.mysql.jdbc.Driver"
+            url="jdbc:mysql://localhost:3306/hospital"/>
+</Context>
