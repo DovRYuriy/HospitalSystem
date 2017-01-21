@@ -17,6 +17,13 @@ public interface ChamberService {
     List<Chamber> findAllFree();
 
     /**
+     * Returns a list of free chambers in hospital by their type.
+     *
+     * @return a list of free chambers in hospital by their type.
+     */
+    List<Chamber> findAllFreeByType(String s);
+
+    /**
      * Returns chamber by id.
      *
      * @return chamber by id
@@ -45,4 +52,5 @@ public interface ChamberService {
      * @return true if chamber successfully deleted.
      */
     boolean deleteChamber(Chamber chamber);
+
 }

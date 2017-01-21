@@ -6,6 +6,7 @@ import ua.yuriydr.hospital.dao.mysql.MySqlDaoFactory;
 import ua.yuriydr.hospital.model.PersonDiagnosis;
 import ua.yuriydr.hospital.service.PersonDiagnosisService;
 
+import java.util.Iterator;
 import java.util.List;
 
 public class PersonDiagnosisServiceImpl implements PersonDiagnosisService {

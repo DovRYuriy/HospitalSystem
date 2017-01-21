@@ -6,7 +6,7 @@ import ua.yuriydr.hospital.model.Role;
 import java.util.List;
 
 /**
- * Represents methods to manage diagnoses in the hospital.
+ * Represents methods to manage roles in the hospital.
  *
  * @see MySqlRoleDao
  */
@@ -28,15 +28,15 @@ public interface RoleDao {
     Role findRoleById(Long id);
 
     /**
-     * Returns diagnosis by name.
+     * Returns role by name.
      *
      * @param name role name.
-     * @return diagnosis.
+     * @return role.
      */
     Role findRoleByName(String name);
 
     /**
-     * Delete diagnosis.
+     * Delete role.
      *
      * @param role that need to delete.
      * @return true if role successfully deleted.

@@ -106,7 +106,7 @@
         </table>
     </div>
     <div>
-        <form name="setNewDiagnosis" method="POST" action="${pageContext.request.contextPath}/controller/">
+        <form name="setNewDiagnosis" method="GET" action="${pageContext.request.contextPath}/controller/">
             <input type="hidden" name="command" value="redirect"/>
             <input type="hidden" name="redirectTo" value="setDiagnosisPage"/>
             <input class="regButton" type="submit" name="goToRegister"

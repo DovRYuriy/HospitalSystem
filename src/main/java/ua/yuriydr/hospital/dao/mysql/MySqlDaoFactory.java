@@ -72,4 +72,14 @@ public class MySqlDaoFactory {
         return MySqlChamberDao.getInstance();
     }
 
+    /**
+     * Returns ChamberTypeDao object.
+     *
+     * @return ChamberTypeDao implementation object.
+     * @see MySqlChamberTypeDao
+     */
+    public static ChamberTypeDao getChamberTypeDao() {
+        return MySqlChamberTypeDao.getInstance();
+    }
+
 }

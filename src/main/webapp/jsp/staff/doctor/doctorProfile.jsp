@@ -34,6 +34,13 @@
             <input type="hidden" name="redirectTo" value="doctorMainPage"/>
             <input type="submit" name="goToStaff" value="<fmt:message key='message.doctor.patients'/>"/>
         </form>
+
+        <form name="goToAllPatients" method="GET" action="${pageContext.request.contextPath}/controller/">
+            <input type="hidden" name="command" value="redirect"/>
+            <input type="hidden" name="redirectTo" value="allPatients"/>
+            <input type="submit" name="goToPatients" value="<fmt:message key='message.doctor.patients.all'/>"/>
+        </form>
+
     </nav>
     <div class="motherCountry">
         <div class="countryBox">

@@ -51,6 +51,11 @@ public class PersonServiceImpl implements PersonService {
     }
 
     @Override
+    public boolean updateChamber(Person patient) {
+        return personDao.updateChamber(patient);
+    }
+
+    @Override
     public boolean updatePerson(Person person) {
         return personDao.updatePerson(person);
     }

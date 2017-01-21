@@ -65,6 +65,8 @@ public class RegistrationPatientCommand implements Command {
             idChamber = Long.valueOf(s);
         }
 
+        person.setIdChamber(idChamber);
+
         Diagnosis diagnosis = new Diagnosis();
         diagnosis.setName(request.getParameter("diagnosis"));
         diagnosis.setDescription(request.getParameter("description"));

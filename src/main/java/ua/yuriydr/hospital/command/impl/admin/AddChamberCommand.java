@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 import ua.yuriydr.hospital.command.Command;
 import ua.yuriydr.hospital.command.CommandHelper;
 import ua.yuriydr.hospital.model.Chamber;
+import ua.yuriydr.hospital.model.ChamberType;
 import ua.yuriydr.hospital.service.ChamberService;
 import ua.yuriydr.hospital.service.factory.ServiceFactory;
 import ua.yuriydr.hospital.utils.PagesManager;
@@ -47,6 +48,10 @@ public class AddChamberCommand implements Command {
         newChamber.setNumber(Long.valueOf(number));
         newChamber.setMaxCount(Long.valueOf(capacity));
 
+        ChamberType type = new ChamberType();
+        type.setIdChamberType(Long.valueOf(request.getParameter("chambersType")));
+        newChamber.setChamberType(type);
+
         List<Chamber> chambers = (List<Chamber>) session.getAttribute("chambersInHospital");
         for (Chamber chamber : chambers) {
             if (chamber.getNumber().equals(newChamber.getNumber())) {
@@ -58,6 +63,7 @@ public class AddChamberCommand implements Command {
         if (invalid) {
             logger.debug("Add chamber, number is busy");
             session.setAttribute("incorrectNumber", "incorrectNumber");
+            session.setAttribute("chamber", newChamber);
             session.removeAttribute("incorrectCapacity");
             page = (String) session.getAttribute("currentPage");
         } else {
@@ -73,7 +79,7 @@ public class AddChamberCommand implements Command {
                 session.removeAttribute("incorrectNumber");
                 session.removeAttribute("removeChamberFailed");
             } else {
-                logger.debug("successfully added chamber");
+                logger.debug("unsuccessfully added chamber");
             }
             page = PagesManager.getProperty("path.page.manageHospital");
             session.setAttribute("currentPage", page);

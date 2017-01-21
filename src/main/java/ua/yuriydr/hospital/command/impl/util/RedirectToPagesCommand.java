@@ -2,19 +2,10 @@ package ua.yuriydr.hospital.command.impl.util;
 
 import org.apache.log4j.Logger;
 import ua.yuriydr.hospital.command.Command;
-import ua.yuriydr.hospital.model.Chamber;
-import ua.yuriydr.hospital.model.Person;
-import ua.yuriydr.hospital.model.PersonDiagnosis;
-import ua.yuriydr.hospital.model.Role;
-import ua.yuriydr.hospital.service.ChamberService;
-import ua.yuriydr.hospital.service.PersonDiagnosisService;
-import ua.yuriydr.hospital.service.PersonService;
-import ua.yuriydr.hospital.service.RoleService;
+import ua.yuriydr.hospital.model.*;
+import ua.yuriydr.hospital.service.*;
 import ua.yuriydr.hospital.service.factory.ServiceFactory;
 import ua.yuriydr.hospital.service.factory.impl.ChamberServiceImpl;
-import ua.yuriydr.hospital.service.factory.impl.PersonDiagnosisServiceImpl;
-import ua.yuriydr.hospital.service.factory.impl.PersonServiceImpl;
-import ua.yuriydr.hospital.service.factory.impl.RoleServiceImpl;
 import ua.yuriydr.hospital.utils.PagesManager;
 import ua.yuriydr.hospital.utils.UserUtils;
 
@@ -43,6 +34,8 @@ public class RedirectToPagesCommand implements Command {
         controllers.put(PagesManager.getProperty("path.page.nurseMainPage"), this::fillNurseMainPage);
         controllers.put(PagesManager.getProperty("path.page.manageHospital"), this::fillHospitalPage);
         controllers.put(PagesManager.getProperty("path.page.addChamberPage"), this::fillAddChamberPage);
+        controllers.put(PagesManager.getProperty("path.page.allPatients"), this::fillAllPatientsPage);
+        controllers.put(PagesManager.getProperty("path.page.setDiagnosisPage"), this::fillSetDiagnosisPage);
     }
 
     @Override
@@ -82,7 +75,7 @@ public class RedirectToPagesCommand implements Command {
         HttpSession session = request.getSession();
 
         ChamberService chamberService = ChamberServiceImpl.getInstance();
-        List<Chamber> chambers = chamberService.findAllFree();
+        List<Chamber> chambers = chamberService.findAllFreeByType("ward");
 
         logger.debug(chambers);
         session.setAttribute("chambers", chambers);
@@ -102,9 +95,10 @@ public class RedirectToPagesCommand implements Command {
                 iterator.remove();
             }
         }
+        session.setAttribute("roles", roleList);
 
         ChamberService chamberService = ChamberServiceImpl.getInstance();
-        List<Chamber> chambers = chamberService.findAllFree();
+        List<Chamber> chambers = chamberService.findAllFreeByType("cabinet");
 
         logger.debug(chambers);
         session.setAttribute("chambers", chambers);
@@ -112,7 +106,6 @@ public class RedirectToPagesCommand implements Command {
         logger.debug(roleList);
         session.removeAttribute("removeChamberFailed");
         session.removeAttribute("removeFailed");
-        session.setAttribute("roles", roleList);
     }
 
     private void fillStaffForEdit(HttpServletRequest request) {
@@ -180,7 +173,7 @@ public class RedirectToPagesCommand implements Command {
         PersonDiagnosisService personDiagnosisService = ServiceFactory.getPersonDiagnosisService();
         person.setPersonDiagnosisList(personDiagnosisService.findAllByPatientId(person.getIdPerson()));
 
-        Collections.reverse(person.getPersonDiagnosisList());
+        person.getPersonDiagnosisList().sort((o1, o2) -> o2.getDate().compareTo(o1.getDate()));
 
         logger.debug(person.getPersonDiagnosisList());
         session.setAttribute("patientInfo", person.getPersonDiagnosisList());
@@ -197,13 +190,16 @@ public class RedirectToPagesCommand implements Command {
 
         Set<Person> patients = new HashSet<>();
         for (PersonDiagnosis personDiagnosis : personDiagnoses) {
-            patients.add(personDiagnosis.getPatient());
+            if (personDiagnosis.getPatient().getIdChamber() != 0) {
+                patients.add(personDiagnosis.getPatient());
+            }
         }
 
         session.removeAttribute("person");
         session.removeAttribute("diagnosis");
         session.removeAttribute("prescription");
         session.removeAttribute("incorrectData");
+        session.removeAttribute("personChamber");
 
         logger.debug(patients);
         session.setAttribute("myPatients", patients);
@@ -229,13 +225,22 @@ public class RedirectToPagesCommand implements Command {
         logger.debug("Fill edit patient page");
 
         HttpSession session = request.getSession();
-        Long idPatient = Long.valueOf(request.getParameter("id"));
+        Person doc = (Person) session.getAttribute("user");
 
+        Long idPatient = Long.valueOf(request.getParameter("id"));
         PersonService personService = ServiceFactory.getPersonService();
         session.setAttribute("person", personService.findPersonById(idPatient));
 
         PersonDiagnosisService personDiagnosisService = ServiceFactory.getPersonDiagnosisService();
         List<PersonDiagnosis> personDiagnosisList = personDiagnosisService.findAllByPatientId(idPatient);
+        Iterator iterator = personDiagnosisList.listIterator();
+        while (iterator.hasNext()) {
+            PersonDiagnosis personDiagnosis = (PersonDiagnosis) iterator.next();
+            if (!personDiagnosis.getDoctor().getIdPerson().equals(doc.getIdPerson())) {
+                iterator.remove();
+            }
+        }
+
         Collections.reverse(personDiagnosisList);
         session.setAttribute("patientDiagnosis", personDiagnosisList);
 
@@ -251,6 +256,14 @@ public class RedirectToPagesCommand implements Command {
 
         PersonDiagnosisService personDiagnosisService = ServiceFactory.getPersonDiagnosisService();
         List<PersonDiagnosis> personDiagnosisList = personDiagnosisService.findAllForNurse();
+        Iterator iterator = personDiagnosisList.listIterator();
+        while (iterator.hasNext()) {
+            PersonDiagnosis personDiagnosis = (PersonDiagnosis) iterator.next();
+            if (personDiagnosis.getPatient().getIdChamber() == 0) {
+                iterator.remove();
+            }
+        }
+
         personDiagnosisList.sort((o1, o2) -> o2.getDate().compareTo(o1.getDate()));
 
         logger.debug(personDiagnosisList);
@@ -258,7 +271,12 @@ public class RedirectToPagesCommand implements Command {
     }
 
     private void fillAddChamberPage(HttpServletRequest request) {
+        HttpSession session = request.getSession();
 
+        ChamberTypeService chamberTypeService = ServiceFactory.getChamberTypeService();
+        List<ChamberType> types = chamberTypeService.findAll();
+
+        session.setAttribute("chambersType", types);
     }
 
     private void fillHospitalPage(HttpServletRequest request) {
@@ -274,4 +292,36 @@ public class RedirectToPagesCommand implements Command {
         session.setAttribute("chambersInHospital", chambers);
     }
 
+    private void fillAllPatientsPage(HttpServletRequest request) {
+        HttpSession session = request.getSession();
+
+        PersonService personService = ServiceFactory.getPersonService();
+        List<Person> personList = personService.findAllByRole("patient");
+        Iterator iterator = personList.listIterator();
+        while (iterator.hasNext()) {
+            Person person = (Person) iterator.next();
+            if (person.getIdChamber() != 0) {
+                iterator.remove();
+            }
+        }
+        session.setAttribute("patients", personList);
+    }
+
+    private void fillSetDiagnosisPage(HttpServletRequest request) {
+        HttpSession session = request.getSession();
+
+        String s = request.getParameter("id");
+        if (s != null) {
+            Long id = Long.valueOf(s);
+            PersonService personService = ServiceFactory.getPersonService();
+            Person person = personService.findPersonById(id);
+            if (person != null) {
+                session.setAttribute("newPerson", person);
+            }
+            ChamberService chamberService = ServiceFactory.getChamberService();
+            List<Chamber> chambers = chamberService.findAllFreeByType("ward");
+            session.setAttribute("personChamber", "personChamber");
+            session.setAttribute("chambers", chambers);
+        }
+    }
 }

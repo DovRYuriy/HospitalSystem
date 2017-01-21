@@ -11,6 +11,7 @@ public class Chamber {
     private Long idChamber;
     private Long maxCount;
     private Long number;
+    private ChamberType chamberType;
 
     private List<Person> patients;
 
@@ -50,6 +51,14 @@ public class Chamber {
         this.number = number;
     }
 
+    public ChamberType getChamberType() {
+        return chamberType;
+    }
+
+    public void setChamberType(ChamberType chamberType) {
+        this.chamberType = chamberType;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -60,6 +69,7 @@ public class Chamber {
         if (idChamber != null ? !idChamber.equals(chamber.idChamber) : chamber.idChamber != null) return false;
         if (maxCount != null ? !maxCount.equals(chamber.maxCount) : chamber.maxCount != null) return false;
         if (number != null ? !number.equals(chamber.number) : chamber.number != null) return false;
+        if (chamberType != null ? !chamberType.equals(chamber.chamberType) : chamber.chamberType != null) return false;
         return patients != null ? patients.equals(chamber.patients) : chamber.patients == null;
     }
 
@@ -68,6 +78,7 @@ public class Chamber {
         int result = idChamber != null ? idChamber.hashCode() : 0;
         result = 31 * result + (maxCount != null ? maxCount.hashCode() : 0);
         result = 31 * result + (number != null ? number.hashCode() : 0);
+        result = 31 * result + (chamberType != null ? chamberType.hashCode() : 0);
         result = 31 * result + (patients != null ? patients.hashCode() : 0);
         return result;
     }
@@ -78,6 +89,7 @@ public class Chamber {
                 "idChamber=" + idChamber +
                 ", maxCount=" + maxCount +
                 ", number=" + number +
+                ", chamberType=" + chamberType +
                 ", patients=" + patients +
                 '}';
     }

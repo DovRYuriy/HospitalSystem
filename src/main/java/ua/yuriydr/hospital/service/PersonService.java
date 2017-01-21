@@ -16,6 +16,7 @@ public interface PersonService {
      */
     List<Person> findAll();
 
+
     /**
      * Return a list of persons by their role.
      *
@@ -87,4 +88,12 @@ public interface PersonService {
      * @return true if password was successfully changed.
      */
     boolean changePersonPassword(Person person);
+
+    /**
+     * Discharge patient.
+     *
+     * @param patient to discharge.
+     * @return true if discharged successfully.
+     */
+    boolean updateChamber(Person patient);
 }

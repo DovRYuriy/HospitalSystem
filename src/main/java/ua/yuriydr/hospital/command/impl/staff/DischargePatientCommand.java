@@ -4,15 +4,14 @@ import org.apache.log4j.Logger;
 import ua.yuriydr.hospital.command.Command;
 import ua.yuriydr.hospital.command.CommandHelper;
 import ua.yuriydr.hospital.model.Diagnosis;
+import ua.yuriydr.hospital.model.Person;
 import ua.yuriydr.hospital.model.PersonDiagnosis;
 import ua.yuriydr.hospital.model.Prescription;
 import ua.yuriydr.hospital.service.DiagnosisService;
 import ua.yuriydr.hospital.service.PersonDiagnosisService;
+import ua.yuriydr.hospital.service.PersonService;
 import ua.yuriydr.hospital.service.PrescriptionService;
 import ua.yuriydr.hospital.service.factory.ServiceFactory;
-import ua.yuriydr.hospital.service.factory.impl.DiagnosisServiceImpl;
-import ua.yuriydr.hospital.service.factory.impl.PersonDiagnosisServiceImpl;
-import ua.yuriydr.hospital.service.factory.impl.PrescriptionServiceImpl;
 import ua.yuriydr.hospital.utils.PagesManager;
 import ua.yuriydr.hospital.utils.UserUtils;
 
@@ -64,6 +63,10 @@ public class DischargePatientCommand implements Command {
         PersonDiagnosisService personDiagnosisService = ServiceFactory.getPersonDiagnosisService();
         if (personDiagnosisService.insertPatientDiagnosis(personDiagnosisFinal)) {
             logger.debug("successful add record about discharge");
+            PersonService personService = ServiceFactory.getPersonService();
+            Person person = personDiagnosisFinal.getPatient();
+            person.setIdChamber(null);
+            personService.updateChamber(person);
         } else {
             logger.debug("discharge record was not added");
         }

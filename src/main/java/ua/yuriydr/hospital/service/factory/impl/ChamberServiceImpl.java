@@ -48,6 +48,19 @@ public class ChamberServiceImpl implements ChamberService {
     }
 
     @Override
+    public List<Chamber> findAllFreeByType(String type) {
+        List<Chamber> freeChambers = new ArrayList<>();
+        List<Chamber> allChambers = chamberDao.findAllByType(type);
+        for (Chamber chamber : allChambers) {
+            chamber.setPatients(personDao.findAllInSpecificChamber(chamber.getIdChamber()));
+            if (chamber.getMaxCount() != chamber.getPatients().size()) {
+                freeChambers.add(chamber);
+            }
+        }
+        return freeChambers;
+    }
+
+    @Override
     public Chamber findChamberById(Long idChamber) {
         Chamber chamber = chamberDao.findChamberById(idChamber);
         chamber.setPatients(personDao.findAllInSpecificChamber(idChamber));

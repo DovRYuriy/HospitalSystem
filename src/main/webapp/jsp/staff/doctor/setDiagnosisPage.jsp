@@ -49,6 +49,16 @@
             <input type="text" name="procedure" placeholder="<fmt:message key='message.prescription.procedure'/>"/><br/><br/>
             <input type="text" name="operation" placeholder="<fmt:message key='message.prescription.operation'/>"/><br/><br/>
 
+            <c:if test="${not empty sessionScope.personChamber}">
+                <label><fmt:message key="message.chamber"/>:
+                    <select name="chambers">
+                        <c:forEach items="${sessionScope.chambers}" var="item">
+                            <option value="${item.idChamber}">${item.number}</option>
+                        </c:forEach>
+                    </select>
+                </label><br/><br/>
+            </c:if>
+
             <input type="submit" name="ok" value="<fmt:message key='message.set.diagnosis'/>"><br/>
         </form>
     </div>

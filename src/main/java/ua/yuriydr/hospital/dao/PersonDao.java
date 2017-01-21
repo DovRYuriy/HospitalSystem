@@ -91,5 +91,13 @@ public interface PersonDao {
      */
     boolean changePersonPassword(Person person);
 
+    /**
+     * Discharge patient from hospital
+     *
+     * @param patient to discharge.
+     * @return boolean to discharge.
+     */
+    boolean updateChamber(Person patient);
+
 
 }

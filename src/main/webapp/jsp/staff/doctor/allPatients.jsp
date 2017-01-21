@@ -6,7 +6,7 @@
 
 <html>
 <head>
-    <title><fmt:message key="message.doctor.patients"/></title>
+    <title><fmt:message key="message.doctor.patients.all"/></title>
     <link rel="icon" href="../../../resources/image/favicon.ico" type="image/ico">
     <link rel="stylesheet" href="<c:url value="../../../resources/style/style.css"/>" type="text/css">
     <link rel="stylesheet" href="<c:url value="../../../resources/style/style1.css"/>" type="text/css">
@@ -22,9 +22,6 @@
     </header>
 </div>
 <div class="container1">
-    <div>
-        <h1><fmt:message key="message.patient.hello"/>, ${sessionScope.user.name} ${sessionScope.user.surname}.</h1>
-    </div>
     <nav>
         <form name="goToProfile" method="GET" action="${pageContext.request.contextPath}/controller/">
             <input type="hidden" name="command" value="redirect"/>
@@ -45,46 +42,41 @@
         </form>
     </nav>
     <div>
-        <h3><fmt:message key='message.doctor.patients'/>:</h3>
+        <h3><fmt:message key='message.doctor.patients.all'/>:</h3>
         <c:choose>
-            <c:when test="${not empty sessionScope.myPatients}">
+            <c:when test="${not empty sessionScope.patients}">
                 <table border="1px">
                     <tr>
                         <th><fmt:message key="message.profile.name"/></th>
                         <th><fmt:message key="message.profile.surname"/></th>
                         <th><fmt:message key="message.profile.phone"/></th>
+                        <th><fmt:message key="message.profile.email"/></th>
                         <th><fmt:message key="message.doctor.service"/></th>
-                        <th><fmt:message key="message.doctor.discharge"/></th>
                     </tr>
-                    <c:forEach items="${sessionScope.myPatients}" var="item">
+                    <c:forEach items="${sessionScope.patients}" var="item">
                         <tr>
                             <td>${item.name}</td>
                             <td>${item.surname}</td>
                             <td>${item.phone}</td>
+                            <td>${item.email}</td>
                             <td>
-                                <a href="?command=redirect&redirectTo=editPatientPage&id=${item.idPerson}">
-                                    <fmt:message key="message.doctor.service"/></a>
-                            </td>
-                            <td>
-                                <a href="?command=redirect&redirectTo=dischargePatientPage&id=${item.idPerson}">
-                                    <fmt:message key="message.doctor.discharge"/></a>
+                                <form name="setNewDiagnosis" method="GET"
+                                      action="${pageContext.request.contextPath}/controller/">
+                                    <input type="hidden" name="command" value="redirect"/>
+                                    <input type="hidden" name="redirectTo" value="setDiagnosisPage"/>
+                                    <input type="hidden" name="id" value="${item.idPerson}"/>
+                                    <input type="submit" name="goToAddDiagnosis"
+                                           value="<fmt:message key='message.set.diagnosis'/>"/>
+                                </form>
                             </td>
                         </tr>
                     </c:forEach>
                 </table>
             </c:when>
             <c:otherwise>
-                <h3><fmt:message key="message.doctor.patients.empty"/></h3>
+                <h3><fmt:message key="message.doctor.patients.empty.hospital"/></h3>
             </c:otherwise>
         </c:choose>
-    </div>
-    <div>
-        <form name="registrationForm" method="GET" action="${pageContext.request.contextPath}/controller/">
-            <input type="hidden" name="command" value="redirect"/>
-            <input type="hidden" name="redirectTo" value="registrationPatient"/>
-            <input class="regButton" type="submit" name="goToRegister"
-                   value="<fmt:message key='message.admin.registration'/>"/>
-        </form>
     </div>
     <footer>
         <jsp:include page="../../footer.jsp"/>

@@ -45,7 +45,7 @@ body{
 	height: 60px;
 	padding: 20px;
 	font-size: 14pt;
-	line-height: 0px;
+	line-height: 0;
 	border: 4px solid #06CD06;
 	outline: none;
 	transition: transform .5s 0s, background-color 2s 0s;

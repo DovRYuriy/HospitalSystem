@@ -55,6 +55,7 @@ public class UserUtils {
         accessMap.put(PagesManager.getProperty("path.page.registrationPatient"), DOCTOR_ROLE);
         accessMap.put(PagesManager.getProperty("path.page.dischargePatientPage"), DOCTOR_ROLE);
         accessMap.put(PagesManager.getProperty("path.page.setDiagnosisPage"), DOCTOR_ROLE);
+        accessMap.put(PagesManager.getProperty("path.page.allPatients"), DOCTOR_ROLE);
         accessMap.put(PagesManager.getProperty("path.page.nurseMainPage"), NURSE_ROLE);
         accessMap.put(PagesManager.getProperty("path.page.nurseProfile"), NURSE_ROLE);
         accessMap.put(PagesManager.getProperty("path.page.adminMainPage"), ADMIN_ROLE);

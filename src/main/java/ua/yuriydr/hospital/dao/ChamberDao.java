@@ -21,6 +21,13 @@ public interface ChamberDao {
     List<Chamber> findAll();
 
     /**
+     * Returns a list of chambers in hospital by their type
+     *
+     * @return a list of chambers in hospital by their type.
+     */
+    List<Chamber> findAllByType(String type);
+
+    /**
      * Returns a chamber by id.
      *
      * @param id chamber.

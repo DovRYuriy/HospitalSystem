@@ -3,6 +3,7 @@ package ua.yuriydr.hospital.dao.mysql.impl;
 import org.apache.log4j.Logger;
 import ua.yuriydr.hospital.dao.ChamberDao;
 import ua.yuriydr.hospital.model.Chamber;
+import ua.yuriydr.hospital.model.ChamberType;
 import ua.yuriydr.hospital.utils.DatabaseManager;
 
 import java.sql.*;
@@ -15,15 +16,29 @@ public class MySqlChamberDao implements ChamberDao {
 
     private static volatile MySqlChamberDao mySqlChamberDao;
 
-    private static final String FIND_ALL_CHAMBER = "SELECT * FROM hospital.chamber";
-    private static final String FIND_CHAMBER_BY_ID = "SELECT * FROM hospital.chamber WHERE id_chamber = ?";
-    private static final String UPDATE_CHAMBER = "UPDATE hospital.chamber set max_count = ?, number = ? WHERE id_chamber = ?";
+    private static final String FIND_ALL_CHAMBER = "SELECT DISTINCT ch.id_chamber, ch.max_count, ch.number, ch.fk_ch_type, t.chamber_name " +
+            "FROM hospital.chamber ch " +
+            "LEFT JOIN hospital.chamber_type t ON (ch.fk_ch_type = t.id_chamber)";
+
+    private static final String FIND_ALL_CHABERS_BY_TYPE = "SELECT DISTINCT ch.id_chamber, ch.max_count, ch.number, ch.fk_ch_type, t.chamber_name " +
+            "FROM hospital.chamber ch " +
+            "LEFT JOIN hospital.chamber_type t ON (ch.fk_ch_type = t.id_chamber) " +
+            "WHERE t.chamber_name = ?";
+
+    private static final String FIND_CHAMBER_BY_ID = "SELECT ch.id_chamber, ch.max_count, ch.number, ch.fk_ch_type, t.chamber_name " +
+            "FROM hospital.chamber ch " +
+            "LEFT JOIN hospital.chamber_type t ON (ch.fk_ch_type = t.id_chamber) " +
+            "WHERE ch.id_chamber = ?";
+    private static final String UPDATE_CHAMBER = "UPDATE hospital.chamber SET max_count = ?, number = ? WHERE id_chamber = ?";
     private static final String DELETE_CHAMBER = "DELETE FROM hospital.chamber WHERE id_chamber = ?";
-    private static final String INSERT_CHAMBER = "INSERT INTO hospital.chamber(max_count, number) VALUES(?, ?)";
+    private static final String INSERT_CHAMBER = "INSERT INTO hospital.chamber(max_count, number, fk_ch_type) VALUES(?, ?, ?)";
 
     private static final int COLUMN_ID_CHAMBER = 1;
     private static final int COLUMN_MAX_COUNT = 2;
     private static final int COLUMN_NUMBER = 3;
+    private static final int COLUMN_FK_CHAMBER_TYPE = 4;
+    private static final int COLUMN_CHAMBER_TYPE_NAME = 5;
+
 
     private PreparedStatement statement;
     private Connection connection;
@@ -52,7 +67,9 @@ public class MySqlChamberDao implements ChamberDao {
             chamber.setIdChamber(rs.getLong(COLUMN_ID_CHAMBER));
             chamber.setMaxCount(rs.getLong(COLUMN_MAX_COUNT));
             chamber.setNumber(rs.getLong(COLUMN_NUMBER));
-            chamber.setPatients(MySqlPersonDao.getInstance().findAllInSpecificChamber(chamber.getIdChamber()));
+            ChamberType chamberType = new ChamberType();
+            chamberType.setIdChamberType(rs.getLong(COLUMN_FK_CHAMBER_TYPE));
+            chamberType.setChamberName(rs.getString(COLUMN_CHAMBER_TYPE_NAME));
         } catch (SQLException e) {
             e.printStackTrace();
             return null;
@@ -76,6 +93,32 @@ public class MySqlChamberDao implements ChamberDao {
                 chambers.add(createChamber(rs));
             }
             logger.debug("All chamber were found " + chambers);
+
+        } catch (SQLException e) {
+            logger.error("SQLException thrown when try to find all chambers: " + e);
+        } finally {
+            DatabaseManager.closeAll(connection, statement, rs);
+        }
+        return chambers;
+    }
+
+    @Override
+    public List<Chamber> findAllByType(String type) {
+        logger.debug("Try to find all chambers by type " + type);
+
+        ResultSet rs = null;
+        statement = null;
+        List<Chamber> chambers = new ArrayList<>();
+        connection = DatabaseManager.getConnection();
+
+        try {
+            statement = connection.prepareStatement(FIND_ALL_CHABERS_BY_TYPE);
+            statement.setString(1, type);
+            rs = statement.executeQuery();
+            while (rs.next()) {
+                chambers.add(createChamber(rs));
+            }
+            logger.debug("Chambers were found " + chambers);
 
         } catch (SQLException e) {
             logger.error("SQLException thrown when try to find all chambers: " + e);
@@ -177,6 +220,7 @@ public class MySqlChamberDao implements ChamberDao {
             statement = connection.prepareStatement(INSERT_CHAMBER, Statement.RETURN_GENERATED_KEYS);
             statement.setLong(1, chamber.getMaxCount());
             statement.setLong(2, chamber.getNumber());
+            statement.setLong(3, chamber.getChamberType().getIdChamberType());
 
             if (statement.executeUpdate() > 0) {
                 rs = statement.getGeneratedKeys();

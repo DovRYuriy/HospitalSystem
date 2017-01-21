@@ -40,6 +40,8 @@ public class MySqlPersonDao implements PersonDao {
             "LEFT JOIN hospital.role r ON(p.fk_role = r.id_role)" +
             "WHERE p.email = ?";
 
+    private static final String UPDATE_CHAMBER = "UPDATE hospital.person SET fk_chamber = ? WHERE id_person = ?";
+
     private static final String UPDATE_PERSON = "UPDATE hospital.person SET name = ?, surname = ?, " +
             "birthday = ?, phone = ?, email = ? WHERE id_person = ?";
     private static final String UPDATE_PERSON_PASSWORD = "UPDATE hospital.person SET password = ? WHERE id_person = ?";
@@ -372,6 +374,35 @@ public class MySqlPersonDao implements PersonDao {
             DatabaseManager.closeAll(connection, statement, null);
         }
         logger.debug("Password was not changed");
+        return false;
+    }
+
+    @Override
+    public boolean updateChamber(Person patient) {
+        logger.debug("Try to discharge patient " + patient);
+
+        statement = null;
+        connection = DatabaseManager.getConnection();
+        try {
+            statement = connection.prepareStatement(UPDATE_CHAMBER);
+            Long id = patient.getIdChamber();
+            if (id == null) {
+                statement.setNull(1, Types.INTEGER);
+            } else {
+                statement.setLong(1, id);
+            }
+            statement.setLong(2, patient.getIdPerson());
+            if (statement.executeUpdate() > 0) {
+                logger.debug("Person was discharged successfully ");
+                return true;
+            }
+        } catch (SQLException e) {
+            logger.error("SQLException thrown when try to discharge patient: " + e);
+        } finally {
+            DatabaseManager.closeAll(connection, statement, null);
+        }
+
+        logger.debug("Patient was not discharged " + patient);
         return false;
     }
 

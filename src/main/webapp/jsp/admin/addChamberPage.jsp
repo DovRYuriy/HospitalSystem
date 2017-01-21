@@ -42,6 +42,7 @@
                     <fmt:message key="message.hospital.error.number"/><br/>
                 </c:if>
             </div>
+
             <input type="number" name="count" value="${sessionScope.chamber.maxCount}"
                    placeholder="<fmt:message key='message.hospital.add.capacity'/>" min="1" max="20">
             <div class="error">
@@ -49,6 +50,15 @@
                     <fmt:message key="message.hospital.error.capacity"/><br/>
                 </c:if>
             </div>
+
+            <label><fmt:message key="message.hospital.type"/>:
+                <select name="chambersType">
+                    <c:forEach items="${sessionScope.chambersType}" var="item">
+                        <option value="${item.idChamberType}">${item.chamberName}</option>
+                    </c:forEach>
+                </select>
+            </label><br/><br/>
+
             <input type="submit" name="add" value="<fmt:message key='message.hospital.add'/>"><br/>
         </form>
     </div>
