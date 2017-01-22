@@ -156,6 +156,7 @@ public class MySqlPersonDiagnosisDao implements PersonDiagnosisDao {
         statement = null;
         connection = DatabaseManager.getConnection();
         try {
+            connection.setAutoCommit(false);
             statement = connection.prepareStatement(UPDATE_PERSON_DIAGNOSIS);
             statement.setTimestamp(1, personDiagnosis.getDate());
             statement.setTimestamp(2, personDiagnosis.getDischargeDate());
@@ -165,10 +166,12 @@ public class MySqlPersonDiagnosisDao implements PersonDiagnosisDao {
             statement.setLong(6, personDiagnosis.getPrescription().getIdPrescription());
             if (statement.executeUpdate() > 0) {
                 logger.debug("Person diagnosis was updated successfully");
+                connection.commit();
                 return true;
             }
         } catch (SQLException e) {
             logger.error("SQLException thrown when try to update person diagnosis " + e);
+            rollback(connection);
         } finally {
             DatabaseManager.closeAll(connection, statement, null);
         }
@@ -183,6 +186,7 @@ public class MySqlPersonDiagnosisDao implements PersonDiagnosisDao {
         statement = null;
         connection = DatabaseManager.getConnection();
         try {
+            connection.setAutoCommit(false);
             statement = connection.prepareStatement(DELETE_PERSON_DIAGNOSIS);
             statement.setLong(1, personDiagnosis.getPatient().getIdPerson());
             statement.setLong(2, personDiagnosis.getDoctor().getIdPerson());
@@ -190,10 +194,12 @@ public class MySqlPersonDiagnosisDao implements PersonDiagnosisDao {
             statement.setLong(4, personDiagnosis.getPrescription().getIdPrescription());
             if (statement.executeUpdate() > 0) {
                 logger.debug("Person diagnosis was deleted successfully");
+                connection.commit();
                 return true;
             }
         } catch (SQLException e) {
             logger.error("SQLException thrown when try to delete person diagnosis: " + e);
+            rollback(connection);
         } finally {
             DatabaseManager.closeAll(connection, statement, null);
         }
@@ -208,9 +214,9 @@ public class MySqlPersonDiagnosisDao implements PersonDiagnosisDao {
 
         statement = null;
         connection = DatabaseManager.getConnection();
-        ResultSet rs;
 
         try {
+            connection.setAutoCommit(false);
             statement = connection.prepareStatement(INSERT_PERSON_DIAGNOSIS, Statement.RETURN_GENERATED_KEYS);
             statement.setLong(1, personDiagnosis.getPatient().getIdPerson());
             statement.setLong(2, personDiagnosis.getDoctor().getIdPerson());
@@ -220,11 +226,13 @@ public class MySqlPersonDiagnosisDao implements PersonDiagnosisDao {
             statement.setTimestamp(6, personDiagnosis.getDischargeDate());
             if (statement.executeUpdate() > 0) {
                 logger.debug("Person diagnosis added successfully " + personDiagnosis);
+                connection.commit();
                 return true;
             }
 
         } catch (SQLException e) {
             logger.error("SQLException thrown when try to insert patient diagnosis: " + e);
+            rollback(connection);
         } finally {
             DatabaseManager.closeAll(connection, statement, null);
         }
@@ -232,4 +240,11 @@ public class MySqlPersonDiagnosisDao implements PersonDiagnosisDao {
         return false;
     }
 
+    private void rollback(Connection connection) {
+        try {
+            connection.rollback();
+        } catch (SQLException e) {
+            logger.error("rollback error");
+        }
+    }
 }

@@ -131,8 +131,8 @@ public class RedirectToPagesCommand implements Command {
         Person person = (Person) session.getAttribute("user");
 
         Set<Person> doctors = new HashSet<>();
-        if (person.getPersonDiagnosisList().size() != 0) {
-            doctors.add(person.getPersonDiagnosisList().get(0).getDoctor());
+        for (PersonDiagnosis pd : person.getPersonDiagnosisList()) {
+            doctors.add(pd.getDoctor());
         }
 
         PersonService personService = ServiceFactory.getPersonService();
@@ -159,6 +159,14 @@ public class RedirectToPagesCommand implements Command {
         session.removeAttribute("person");
         session.removeAttribute("invalidPerson");
         session.removeAttribute("incorrectData");
+
+        ChamberService chamberService = ServiceFactory.getChamberService();
+        List<Chamber> chambers = chamberService.findAllFreeByType("cabinet");
+        if (chambers.size() == 0) {
+            session.setAttribute("blockRegistration", "blockRegistration");
+        } else {
+            session.removeAttribute("blockRegistration");
+        }
 
         logger.debug(doctors);
         session.setAttribute("staffInHospital", doctors);
@@ -191,10 +199,22 @@ public class RedirectToPagesCommand implements Command {
         Set<Person> patients = new HashSet<>();
         for (PersonDiagnosis personDiagnosis : personDiagnoses) {
             if (personDiagnosis.getPatient().getIdChamber() != 0) {
-                patients.add(personDiagnosis.getPatient());
+                if (personDiagnosis.getDischargeDate() == null) {
+                    patients.add(personDiagnosis.getPatient());
+                }
             }
         }
 
+        ChamberService chamberService = ServiceFactory.getChamberService();
+        List<Chamber> chambers = chamberService.findAllFreeByType("ward");
+        if (chambers.size() == 0) {
+            session.setAttribute("blockRegistration", "blockRegistration");
+        } else {
+            session.removeAttribute("blockRegistration");
+        }
+
+        session.removeAttribute("newPerson");
+        session.removeAttribute("notFound");
         session.removeAttribute("person");
         session.removeAttribute("diagnosis");
         session.removeAttribute("prescription");
@@ -229,24 +249,27 @@ public class RedirectToPagesCommand implements Command {
 
         Long idPatient = Long.valueOf(request.getParameter("id"));
         PersonService personService = ServiceFactory.getPersonService();
-        session.setAttribute("person", personService.findPersonById(idPatient));
-
-        PersonDiagnosisService personDiagnosisService = ServiceFactory.getPersonDiagnosisService();
-        List<PersonDiagnosis> personDiagnosisList = personDiagnosisService.findAllByPatientId(idPatient);
-        Iterator iterator = personDiagnosisList.listIterator();
-        while (iterator.hasNext()) {
-            PersonDiagnosis personDiagnosis = (PersonDiagnosis) iterator.next();
-            if (!personDiagnosis.getDoctor().getIdPerson().equals(doc.getIdPerson())) {
-                iterator.remove();
+        Person person = personService.findPersonById(idPatient);
+        if (person == null) {
+            session.setAttribute("notFound", "notFound");
+        } else {
+            session.setAttribute("person", person);
+            PersonDiagnosisService personDiagnosisService = ServiceFactory.getPersonDiagnosisService();
+            List<PersonDiagnosis> personDiagnosisList = personDiagnosisService.findAllByPatientId(idPatient);
+            Iterator iterator = personDiagnosisList.listIterator();
+            while (iterator.hasNext()) {
+                PersonDiagnosis personDiagnosis = (PersonDiagnosis) iterator.next();
+                if (!personDiagnosis.getDoctor().getIdPerson().equals(doc.getIdPerson())) {
+                    iterator.remove();
+                }
             }
+
+            Collections.reverse(personDiagnosisList);
+            session.setAttribute("patientDiagnosis", personDiagnosisList);
+
+            ChamberService chamberService = ChamberServiceImpl.getInstance();
+            session.setAttribute("chamber", chamberService.findChamberById(personDiagnosisList.get(0).getPatient().getIdChamber()));
         }
-
-        Collections.reverse(personDiagnosisList);
-        session.setAttribute("patientDiagnosis", personDiagnosisList);
-
-        ChamberService chamberService = ChamberServiceImpl.getInstance();
-        session.setAttribute("chamber", chamberService.findChamberById(personDiagnosisList.get(0).getPatient().getIdChamber()));
-
     }
 
     private void fillNurseMainPage(HttpServletRequest request) {
@@ -259,11 +282,10 @@ public class RedirectToPagesCommand implements Command {
         Iterator iterator = personDiagnosisList.listIterator();
         while (iterator.hasNext()) {
             PersonDiagnosis personDiagnosis = (PersonDiagnosis) iterator.next();
-            if (personDiagnosis.getPatient().getIdChamber() == 0) {
+            if (personDiagnosis.getPatient().getIdChamber() == 0 || personDiagnosis.getDischargeDate() != null) {
                 iterator.remove();
             }
         }
-
         personDiagnosisList.sort((o1, o2) -> o2.getDate().compareTo(o1.getDate()));
 
         logger.debug(personDiagnosisList);

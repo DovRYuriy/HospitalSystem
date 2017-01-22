@@ -89,12 +89,19 @@
             </table>
         </div>
         <div>
-            <form name="registrationForm" method="GET" action="${pageContext.request.contextPath}/controller/">
-                <input type="hidden" name="command" value="redirect"/>
-                <input type="hidden" name="redirectTo" value="registration"/>
-                <input class="regButton" type="submit" name="goToRegister"
-                       value="<fmt:message key='message.admin.registration'/>"/>
-            </form>
+            <c:choose>
+                <c:when test="${empty sessionScope.blockRegistration}">
+                    <form name="registrationForm" method="GET" action="${pageContext.request.contextPath}/controller/">
+                        <input type="hidden" name="command" value="redirect"/>
+                        <input type="hidden" name="redirectTo" value="registration"/>
+                        <input class="regButton" type="submit" name="goToRegister"
+                               value="<fmt:message key='message.admin.registration'/>"/>
+                    </form>
+                </c:when>
+                <c:otherwise>
+                    <h3><fmt:message key="message.registration.block"/></h3>
+                </c:otherwise>
+            </c:choose>
         </div>
     </div>
 

@@ -24,12 +24,23 @@
 </div>
 <div class="container1">
     <nav>
-        <form name="goToStaffPage" method="GET" action="${pageContext.request.contextPath}/controller/">
-            <input type="hidden" name="command" value="redirect"/>
-            <input type="hidden" name="id" value="${sessionScope.person.idPerson}"/>
-            <input type="hidden" name="redirectTo" value="editPatientPage"/>
-            <input type="submit" name="goToStaff" value="<fmt:message key='message.back'/>"/>
-        </form>
+        <c:choose>
+            <c:when test="${empty sessionScope.person.idPerson}">
+                <form name="goToStaffPage" method="GET" action="${pageContext.request.contextPath}/controller/">
+                    <input type="hidden" name="command" value="redirect"/>
+                    <input type="hidden" name="redirectTo" value="allPatients"/>
+                    <input type="submit" name="goToAllPatients" value="<fmt:message key='message.back'/>"/>
+                </form>
+            </c:when>
+            <c:otherwise>
+                <form name="goToStaffPage" method="GET" action="${pageContext.request.contextPath}/controller/">
+                    <input type="hidden" name="command" value="redirect"/>
+                    <input type="hidden" name="id" value="${sessionScope.person.idPerson}"/>
+                    <input type="hidden" name="redirectTo" value="editPatientPage"/>
+                    <input type="submit" name="goToStaff" value="<fmt:message key='message.back'/>"/>
+                </form>
+            </c:otherwise>
+        </c:choose>
     </nav>
     <div class="main">
         <h3><fmt:message key="message.set.diagnosis.title"/>:</h3>
@@ -40,14 +51,29 @@
                    pattern="[A-Z][a-z]+|[А-Я][а-я]+"
                    placeholder="<fmt:message key='message.patient.diagnosis'/>"/>
             <br/>
+            <div class="error">
+                <c:if test="${not empty sessionScope.incorrectDiagnosis}">
+                    <fmt:message key="message.registration.error.diagnosis"/><br/>
+                </c:if>
+            </div>
             <br/>
             <textarea rows="4" cols="50" name="description" form="usrform">
-                <fmt:message key="message.diagnosis.description"/>
+                <c:choose>
+                    <c:when test="${empty sessionScope.diagnosis.description}">
+                        <fmt:message key="message.diagnosis.description"/>
+                    </c:when>
+                    <c:otherwise>
+                        ${sessionScope.diagnosis.description}
+                    </c:otherwise>
+                </c:choose>
             </textarea><br/><br/>
 
-            <input type="text" name="drugs" placeholder="<fmt:message key='message.prescription.drugs'/>"/><br/><br/>
-            <input type="text" name="procedure" placeholder="<fmt:message key='message.prescription.procedure'/>"/><br/><br/>
-            <input type="text" name="operation" placeholder="<fmt:message key='message.prescription.operation'/>"/><br/><br/>
+            <input type="text" name="drugs" value="${sessionScope.prescript.drugs}"
+                   placeholder="<fmt:message key='message.prescription.drugs'/>"/><br/><br/>
+            <input type="text" name="procedure" value="${sessionScope.prescript.procedure}"
+                   placeholder="<fmt:message key='message.prescription.procedure'/>"/><br/><br/>
+            <input type="text" name="operation" value="${sessionScope.prescript.operation}"
+                   placeholder="<fmt:message key='message.prescription.operation'/>"/><br/><br/>
 
             <c:if test="${not empty sessionScope.personChamber}">
                 <label><fmt:message key="message.chamber"/>:

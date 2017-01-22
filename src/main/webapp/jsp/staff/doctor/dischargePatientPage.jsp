@@ -42,6 +42,17 @@
             <br/>
             <textarea rows="4" cols="50" name="description"
                       form="usrform">${sessionScope.personDiagnosis.diagnosis.description}</textarea><br/><br/>
+
+            <input type="text" name="drugs"
+                   value="${sessionScope.personDiagnosis.prescription.drugs}"
+                   placeholder="<fmt:message key='message.prescription.drugs'/>"/><br/><br/>
+            <input type="text" name="procedure"
+                   value="${sessionScope.personDiagnosis.prescription.procedure}"
+                   placeholder="<fmt:message key='message.prescription.procedure'/>"/><br/><br/>
+            <input type="text" name="operation"
+                   value="${sessionScope.personDiagnosis.prescription.operation}"
+                   placeholder="<fmt:message key='message.prescription.operation'/>"/><br/><br/>
+
             <input type="submit" name="dischargePtnt" value="<fmt:message key="message.doctor.discharge"/>">
         </form>
     </div>

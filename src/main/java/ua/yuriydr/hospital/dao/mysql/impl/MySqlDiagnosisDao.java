@@ -118,16 +118,19 @@ public class MySqlDiagnosisDao implements DiagnosisDao {
         connection = DatabaseManager.getConnection();
 
         try {
+            connection.setAutoCommit(false);
             statement = connection.prepareStatement(UPDATE_DIAGNOSIS);
             statement.setString(1, diagnosis.getDescription());
             statement.setLong(2, diagnosis.getIdDiagnosis());
 
             if (statement.executeUpdate() > 0) {
                 logger.debug("Diagnosis was updated successfully");
+                connection.commit();
                 return true;
             }
         } catch (SQLException e) {
             logger.error("SQLException thrown when try to update diagnosis: " + e);
+            rollback(connection);
         } finally {
             DatabaseManager.closeAll(connection, statement, null);
         }
@@ -144,15 +147,18 @@ public class MySqlDiagnosisDao implements DiagnosisDao {
         connection = DatabaseManager.getConnection();
 
         try {
+            connection.setAutoCommit(false);
             statement = connection.prepareStatement(DELETE_DIAGNOSIS);
             statement.setLong(1, diagnosis.getIdDiagnosis());
             if (statement.executeUpdate() > 0) {
                 logger.debug("Diagnosis was deleted successfully ");
+                connection.commit();
                 return true;
             }
 
         } catch (SQLException e) {
             logger.error("SQLException thrown when try to delete diagnosis: " + e);
+            rollback(connection);
         } finally {
             DatabaseManager.closeAll(connection, statement, null);
         }
@@ -170,6 +176,7 @@ public class MySqlDiagnosisDao implements DiagnosisDao {
         connection = DatabaseManager.getConnection();
 
         try {
+            connection.setAutoCommit(false);
             statement = connection.prepareStatement(INSERT_DIAGNOSIS, Statement.RETURN_GENERATED_KEYS);
             statement.setString(1, diagnosis.getName());
             statement.setString(2, diagnosis.getDescription());
@@ -179,11 +186,13 @@ public class MySqlDiagnosisDao implements DiagnosisDao {
                 if (rs.next()) {
                     diagnosis.setIdDiagnosis(rs.getLong(COLUMN_ID_DIAGNOSIS));
                     logger.debug("Diagnosis added successfully " + diagnosis);
+                    connection.commit();
                     return true;
                 }
             }
         } catch (SQLException e) {
             logger.debug("SQLException thrown when try to insert new diagnosis: " + e);
+            rollback(connection);
         } finally {
             DatabaseManager.closeAll(connection, statement, null);
         }
@@ -192,4 +201,11 @@ public class MySqlDiagnosisDao implements DiagnosisDao {
         return false;
     }
 
+    private void rollback(Connection connection) {
+        try {
+            connection.rollback();
+        } catch (SQLException e) {
+            logger.error("rollback error");
+        }
+    }
 }

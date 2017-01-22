@@ -4,6 +4,8 @@ import org.apache.log4j.Logger;
 import ua.yuriydr.hospital.command.Command;
 import ua.yuriydr.hospital.command.CommandHelper;
 import ua.yuriydr.hospital.model.Person;
+import ua.yuriydr.hospital.model.PersonDiagnosis;
+import ua.yuriydr.hospital.service.PersonDiagnosisService;
 import ua.yuriydr.hospital.service.PersonService;
 import ua.yuriydr.hospital.service.factory.ServiceFactory;
 import ua.yuriydr.hospital.service.factory.impl.PersonServiceImpl;
@@ -12,6 +14,7 @@ import ua.yuriydr.hospital.utils.UserUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 public class RemovePersonCommand implements Command {
 
@@ -33,10 +36,23 @@ public class RemovePersonCommand implements Command {
 
         Person person = personService.findPersonById(id);
         if (person != null) {
-            if (!personService.deletePerson(person)) {
+            PersonDiagnosisService personDiagnosisService = ServiceFactory.getPersonDiagnosisService();
+            List<PersonDiagnosis> personDiagnosisList = personDiagnosisService.findAllByStaffId(person.getIdPerson());
+            boolean openPersonDiagnosis = false;
+            for (PersonDiagnosis personDiagnosis : personDiagnosisList) {
+                if (personDiagnosis.getDischargeDate() == null) {
+                    openPersonDiagnosis = true;
+                }
+            }
+            if (openPersonDiagnosis) {
                 request.getSession().setAttribute("removeFailed", "removeFailed");
             } else {
-                request.getSession().removeAttribute("removeFailed");
+                for (PersonDiagnosis personDiagnosis : personDiagnosisList) {
+                    personDiagnosisService.deletePatientDiagnosis(personDiagnosis);
+                }
+                if (personService.deletePerson(person)) {
+                    request.getSession().removeAttribute("removeFailed");
+                }
             }
         } else {
             page = PagesManager.getProperty("path.page.error");

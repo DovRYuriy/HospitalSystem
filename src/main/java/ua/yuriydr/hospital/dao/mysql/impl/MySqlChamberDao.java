@@ -164,6 +164,7 @@ public class MySqlChamberDao implements ChamberDao {
         connection = DatabaseManager.getConnection();
 
         try {
+            connection.setAutoCommit(false);
             statement = connection.prepareStatement(UPDATE_CHAMBER);
             statement.setLong(1, chamber.getMaxCount());
             statement.setLong(2, chamber.getNumber());
@@ -171,10 +172,12 @@ public class MySqlChamberDao implements ChamberDao {
 
             if (statement.executeUpdate() > 0) {
                 logger.debug("Chamber was updated successfully");
+                connection.commit();
                 return true;
             }
         } catch (SQLException e) {
             logger.error("SQLException thrown when try to update chamber: " + e);
+            rollback(connection);
         } finally {
             DatabaseManager.closeAll(connection, statement, null);
         }
@@ -191,15 +194,18 @@ public class MySqlChamberDao implements ChamberDao {
         connection = DatabaseManager.getConnection();
 
         try {
+            connection.setAutoCommit(false);
             statement = connection.prepareStatement(DELETE_CHAMBER);
             statement.setLong(1, chamber.getIdChamber());
             if (statement.executeUpdate() > 0) {
                 logger.debug("Chamber was deleted successfully ");
+                connection.commit();
                 return true;
             }
 
         } catch (SQLException e) {
             logger.error("SQLException thrown when try to delete chamber: " + e);
+            rollback(connection);
         } finally {
             DatabaseManager.closeAll(connection, statement, null);
         }
@@ -217,6 +223,7 @@ public class MySqlChamberDao implements ChamberDao {
         connection = DatabaseManager.getConnection();
 
         try {
+            connection.setAutoCommit(false);
             statement = connection.prepareStatement(INSERT_CHAMBER, Statement.RETURN_GENERATED_KEYS);
             statement.setLong(1, chamber.getMaxCount());
             statement.setLong(2, chamber.getNumber());
@@ -227,17 +234,27 @@ public class MySqlChamberDao implements ChamberDao {
                 if (rs.next()) {
                     chamber.setIdChamber(rs.getLong(COLUMN_ID_CHAMBER));
                     logger.debug("Chamber added successfully " + chamber);
+                    connection.commit();
                     return true;
                 }
             }
         } catch (SQLException e) {
             logger.debug("SQLException thrown when try to insert new chamber: " + e);
+            rollback(connection);
         } finally {
             DatabaseManager.closeAll(connection, statement, null);
         }
 
         logger.debug("Chamber was not inserted " + chamber);
         return false;
+    }
+
+    private void rollback(Connection connection) {
+        try {
+            connection.rollback();
+        } catch (SQLException e) {
+            logger.error("rollback error");
+        }
     }
 
 }

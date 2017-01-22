@@ -31,87 +31,112 @@
         </form>
     </nav>
     <div class="main">
-        <h3><fmt:message key="message.doctor.patient.service"/>:</h3>
-        <h4><fmt:message key="message.chamber"/> № ${sessionScope.chamber.number} </h4>
-        <table border="1px">
-            <tr>
-                <th><fmt:message key="message.patient.date"/></th>
-                <th><fmt:message key="message.patient.dischargedate"/></th>
-                <th><fmt:message key="message.patient.diagnosis"/></th>
-                <th><fmt:message key="message.prescription.drugs"/></th>
-                <th><fmt:message key="message.prescription.procedure"/></th>
-                <th><fmt:message key="message.prescription.operation"/></th>
-                <th><fmt:message key="message.crud.remove"/></th>
-            </tr>
-            <c:forEach items="${sessionScope.patientDiagnosis}" var="item">
-                <tr>
-                    <td><dt:dateFormat date="${item.date}" locale="${sessionScope.language}"/></td>
-                    <td>
-                        <c:if test="${not empty item.dischargeDate}">
-                            <dt:dateFormat date="${item.dischargeDate}" locale="${sessionScope.language}"/>
-                        </c:if>
-                    </td>
-                    <td>
-                            ${item.diagnosis.name}<br/>
-                            ${item.diagnosis.description}
-                    </td>
-                    <td>
-                            ${item.prescription.drugs}<br/>
-                        <c:if test="${not empty item.prescription.drugs}">
-                            <form name="giveDrugs" action="${pageContext.request.contextPath}/controller/"
-                                  method="POST">
-                                <input type="hidden" name="command" value="makeStaffAction"/>
-                                <input type="hidden" name="whatAction" value="drugs"/>
-                                <input type="hidden" name="prescriptionId" value="${item.prescription.idPrescription}"/>
-                                <input type="submit" name="make" value="<fmt:message key="message.give"/>!"/>
-                            </form>
-                        </c:if>
-                    </td>
-                    <td>
-                            ${item.prescription.procedure}<br/>
-                        <c:if test="${not empty item.prescription.procedure}">
-                            <form name="makeProcedure" action="${pageContext.request.contextPath}/controller/"
-                                  method="POST">
-                                <input type="hidden" name="command" value="makeStaffAction"/>
-                                <input type="hidden" name="whatAction" value="procedure"/>
-                                <input type="hidden" name="prescriptionId" value="${item.prescription.idPrescription}"/>
-                                <input type="submit" name="make" value="<fmt:message key="message.make"/>!"/>
-                            </form>
-                        </c:if>
-                    </td>
-                    <td>
-                            ${item.prescription.operation}<br/>
-                        <c:if test="${not empty item.prescription.operation}">
-                            <form name="giveDrugs" action="${pageContext.request.contextPath}/controller/"
-                                  method="POST">
-                                <input type="hidden" name="command" value="makeStaffAction"/>
-                                <input type="hidden" name="whatAction" value="operation"/>
-                                <input type="hidden" name="prescriptionId" value="${item.prescription.idPrescription}"/>
-                                <input type="submit" name="make" value="<fmt:message key="message.make"/>!"/>
-                            </form>
-                        </c:if>
-                    </td>
-                    <td>
-                        <form name="removeForm" action="${pageContext.request.contextPath}/controller/" method="POST">
-                            <input type="hidden" name="command" value="removePersonDiagnosis"/>
-                            <input type="hidden" name="idPatient" value="${item.patient.idPerson}"/>
-                            <input type="hidden" name="idStaff" value="${item.doctor.idPerson}"/>
-                            <input type="hidden" name="idDiagnosis" value="${item.diagnosis.idDiagnosis}"/>
-                            <input type="hidden" name="idPrescription" value="${item.prescription.idPrescription}"/>
-                            <input type="submit" name="submitRemove" value="<fmt:message key='message.crud.remove'/>">
-                        </form>
-                    </td>
-                </tr>
-            </c:forEach>
-        </table>
-    </div>
-    <div>
-        <form name="setNewDiagnosis" method="GET" action="${pageContext.request.contextPath}/controller/">
-            <input type="hidden" name="command" value="redirect"/>
-            <input type="hidden" name="redirectTo" value="setDiagnosisPage"/>
-            <input class="regButton" type="submit" name="goToRegister"
-                   value="<fmt:message key='message.set.diagnosis'/>"/>
-        </form>
+        <c:choose>
+            <c:when test="${empty sessionScope.notFound}">
+                <h3><fmt:message key="message.doctor.patient.service"/>:</h3>
+                <h4><fmt:message key="message.chamber"/> № ${sessionScope.chamber.number} </h4>
+                <table border="1px">
+                    <tr>
+                        <th><fmt:message key="message.patient.date"/></th>
+                        <th><fmt:message key="message.patient.dischargedate"/></th>
+                        <th><fmt:message key="message.patient.diagnosis"/></th>
+                        <th><fmt:message key="message.prescription.drugs"/></th>
+                        <th><fmt:message key="message.prescription.procedure"/></th>
+                        <th><fmt:message key="message.prescription.operation"/></th>
+                        <th><fmt:message key="message.crud.remove"/></th>
+                    </tr>
+                    <c:forEach items="${sessionScope.patientDiagnosis}" var="item">
+                        <tr>
+                            <td><dt:dateFormat date="${item.date}" locale="${sessionScope.language}"/></td>
+                            <td>
+                                <c:if test="${not empty item.dischargeDate}">
+                                    <dt:dateFormat date="${item.dischargeDate}" locale="${sessionScope.language}"/>
+                                </c:if>
+                            </td>
+                            <td>
+                                    ${item.diagnosis.name}<br/>
+                                    ${item.diagnosis.description}
+                            </td>
+                            <td>
+                                    ${item.prescription.drugs}<br/>
+                                <c:if test="${empty item.dischargeDate}">
+                                    <c:if test="${not empty item.prescription.drugs}">
+                                        <form name="giveDrugs" action="${pageContext.request.contextPath}/controller/"
+                                              method="POST">
+                                            <input type="hidden" name="command" value="makeStaffAction"/>
+                                            <input type="hidden" name="whatAction" value="drugs"/>
+                                            <input type="hidden" name="prescriptionId"
+                                                   value="${item.prescription.idPrescription}"/>
+                                            <input type="submit" name="make"
+                                                   value="<fmt:message key="message.give"/>!"/>
+                                        </form>
+                                    </c:if>
+                                </c:if>
+                            </td>
+                            <td>
+                                    ${item.prescription.procedure}<br/>
+                                <c:if test="${empty item.dischargeDate}">
+                                    <c:if test="${not empty item.prescription.procedure}">
+                                        <form name="makeProcedure"
+                                              action="${pageContext.request.contextPath}/controller/"
+                                              method="POST">
+                                            <input type="hidden" name="command" value="makeStaffAction"/>
+                                            <input type="hidden" name="whatAction" value="procedure"/>
+                                            <input type="hidden" name="prescriptionId"
+                                                   value="${item.prescription.idPrescription}"/>
+                                            <input type="submit" name="make"
+                                                   value="<fmt:message key="message.make"/>!"/>
+                                        </form>
+                                    </c:if>
+                                </c:if>
+                            </td>
+                            <td>
+                                    ${item.prescription.operation}<br/>
+                                <c:if test="${empty item.dischargeDate}">
+                                    <c:if test="${not empty item.prescription.operation}">
+                                        <form name="makeOperation" action="${pageContext.request.contextPath}/controller/"
+                                              method="POST">
+                                            <input type="hidden" name="command" value="makeStaffAction"/>
+                                            <input type="hidden" name="whatAction" value="operation"/>
+                                            <input type="hidden" name="prescriptionId"
+                                                   value="${item.prescription.idPrescription}"/>
+                                            <input type="submit" name="make"
+                                                   value="<fmt:message key="message.make"/>!"/>
+                                        </form>
+                                    </c:if>
+                                </c:if>
+                            </td>
+                            <td>
+                                <c:if test="${empty item.dischargeDate}">
+                                    <form name="removeForm" action="${pageContext.request.contextPath}/controller/"
+                                          method="POST">
+                                        <input type="hidden" name="command" value="removePersonDiagnosis"/>
+                                        <input type="hidden" name="idPatient" value="${item.patient.idPerson}"/>
+                                        <input type="hidden" name="idStaff" value="${item.doctor.idPerson}"/>
+                                        <input type="hidden" name="idDiagnosis" value="${item.diagnosis.idDiagnosis}"/>
+                                        <input type="hidden" name="idPrescription"
+                                               value="${item.prescription.idPrescription}"/>
+                                        <input type="submit" name="submitRemove"
+                                               value="<fmt:message key='message.crud.remove'/>">
+                                    </form>
+                                </c:if>
+                            </td>
+                        </tr>
+                    </c:forEach>
+                </table>
+                <div>
+                    <form name="setNewDiagnosis" method="GET" action="${pageContext.request.contextPath}/controller/">
+                        <input type="hidden" name="command" value="redirect"/>
+                        <input type="hidden" name="redirectTo" value="setDiagnosisPage"/>
+                        <input class="regButton" type="submit" name="goToRegister"
+                               value="<fmt:message key='message.set.diagnosis'/>"/>
+                    </form>
+                </div>
+            </c:when>
+            <c:otherwise>
+                <h3><fmt:message key="message.invalid.person"/></h3>
+            </c:otherwise>
+        </c:choose>
     </div>
     <footer>
         <jsp:include page="../../footer.jsp"/>

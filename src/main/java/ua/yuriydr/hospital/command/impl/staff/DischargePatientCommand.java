@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.sql.Timestamp;
+import java.util.List;
 
 public class DischargePatientCommand implements Command {
 
@@ -51,9 +52,9 @@ public class DischargePatientCommand implements Command {
         personDiagnosisFinal.setDischargeDate(new Timestamp(System.currentTimeMillis()));
 
         Prescription prescription = new Prescription();
-        prescription.setDrugs(personDiagnosisFinal.getPrescription().getDrugs());
-        prescription.setProcedure(personDiagnosisFinal.getPrescription().getProcedure());
-        prescription.setOperation(personDiagnosisFinal.getPrescription().getOperation());
+        prescription.setDrugs(request.getParameter("drugs"));
+        prescription.setProcedure(request.getParameter("procedure"));
+        prescription.setOperation(request.getParameter("operation"));
 
         PrescriptionService prescriptionService = ServiceFactory.getPrescriptionService();
         prescriptionService.insertPrescription(prescription);
@@ -67,6 +68,16 @@ public class DischargePatientCommand implements Command {
             Person person = personDiagnosisFinal.getPatient();
             person.setIdChamber(null);
             personService.updateChamber(person);
+
+            //delete all previous records
+            List<PersonDiagnosis> personDiagnoses = personDiagnosisService.findAllByPatientId(person.getIdPerson());
+            for (PersonDiagnosis personDiagnosis : personDiagnoses) {
+                if(personDiagnosis.getDischargeDate() == null){
+                    personDiagnosisService.deletePatientDiagnosis(personDiagnosis);
+                    prescriptionService.deletePrescription(personDiagnosis.getPrescription());
+                    diagnosisService.deleteDiagnosis(personDiagnosis.getDiagnosis());
+                }
+            }
         } else {
             logger.debug("discharge record was not added");
         }

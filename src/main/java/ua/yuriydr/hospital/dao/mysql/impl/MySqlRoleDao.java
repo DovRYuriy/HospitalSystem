@@ -145,15 +145,18 @@ public class MySqlRoleDao implements RoleDao {
         connection = DatabaseManager.getConnection();
 
         try {
+            connection.setAutoCommit(false);
             statement = connection.prepareStatement(DELETE_ROLE);
             statement.setLong(1, role.getIdRole());
 
             if (statement.executeUpdate() > 0) {
                 logger.debug("The role deleted successfully");
+                connection.commit();
                 return true;
             }
         } catch (SQLException e) {
             logger.error("SQLException thrown when try to delete role: " + e);
+            rollback(connection);
         } finally {
             DatabaseManager.closeAll(connection, statement, null);
         }
@@ -171,6 +174,7 @@ public class MySqlRoleDao implements RoleDao {
         ResultSet rs;
 
         try {
+            connection.setAutoCommit(false);
             statement = connection.prepareStatement(INSERT_ROLE, Statement.RETURN_GENERATED_KEYS);
             statement.setString(1, role.getName());
             if (statement.executeUpdate() > 0) {
@@ -178,11 +182,13 @@ public class MySqlRoleDao implements RoleDao {
                 if (rs.next()) {
                     role.setIdRole(rs.getLong(COLUMN_ID_ROLE));
                     logger.debug("Role added successfully " + role);
+                    connection.commit();
                     return true;
                 }
             }
         } catch (SQLException e) {
             logger.error("SQLException thrown when try to insert role: " + e);
+            rollback(connection);
         } finally {
             DatabaseManager.closeAll(connection, statement, null);
         }
@@ -191,4 +197,11 @@ public class MySqlRoleDao implements RoleDao {
         return false;
     }
 
+    private void rollback(Connection connection) {
+        try {
+            connection.rollback();
+        } catch (SQLException e) {
+            logger.error("rollback error");
+        }
+    }
 }

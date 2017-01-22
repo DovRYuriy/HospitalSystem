@@ -215,6 +215,7 @@ public class MySqlPersonDao implements PersonDao {
         statement = null;
         connection = DatabaseManager.getConnection();
         try {
+            connection.setAutoCommit(false);
             statement = connection.prepareStatement(UPDATE_PERSON);
             statement.setString(1, person.getName());
             statement.setString(2, person.getSurname());
@@ -224,10 +225,12 @@ public class MySqlPersonDao implements PersonDao {
             statement.setLong(6, person.getIdPerson());
             if (statement.executeUpdate() > 0) {
                 logger.debug("Person was updated successfully ");
+                connection.commit();
                 return true;
             }
         } catch (SQLException e) {
             logger.error("SQLException thrown when try to update person: " + e);
+            rollback(connection);
         } finally {
             DatabaseManager.closeAll(connection, statement, null);
         }
@@ -244,14 +247,17 @@ public class MySqlPersonDao implements PersonDao {
         connection = DatabaseManager.getConnection();
 
         try {
+            connection.setAutoCommit(false);
             statement = connection.prepareStatement(DELETE_PERSON);
             statement.setLong(1, person.getIdPerson());
             if (statement.executeUpdate() > 0) {
                 logger.debug("Person was deleted successfully");
+                connection.commit();
                 return true;
             }
         } catch (SQLException e) {
             logger.error("SQLException thrown when try to delete person: " + e);
+            rollback(connection);
         } finally {
             DatabaseManager.closeAll(connection, statement, null);
         }
@@ -269,6 +275,7 @@ public class MySqlPersonDao implements PersonDao {
         connection = DatabaseManager.getConnection();
 
         try {
+            connection.setAutoCommit(false);
             statement = connection.prepareStatement(INSERT_PERSON, Statement.RETURN_GENERATED_KEYS);
             statement.setString(1, person.getName());
             statement.setString(2, person.getSurname());
@@ -287,13 +294,16 @@ public class MySqlPersonDao implements PersonDao {
                 if (rs.next()) {
                     person.setIdPerson(rs.getLong(COLUMN_ID_PERSON));
                     logger.debug("Person added successfully " + person);
+                    connection.commit();
                     return true;
                 }
             }
         } catch (SQLIntegrityConstraintViolationException e) {
             logger.error("SQLIntegrityConstraintViolationException thrown when try to insert person " + e);
+            rollback(connection);
         } catch (SQLException e) {
             logger.error("SQLException thrown when try to insert person " + e);
+            rollback(connection);
         } finally {
             DatabaseManager.closeAll(connection, statement, null);
         }
@@ -361,15 +371,18 @@ public class MySqlPersonDao implements PersonDao {
         statement = null;
         connection = DatabaseManager.getConnection();
         try {
+            connection.setAutoCommit(false);
             statement = connection.prepareStatement(UPDATE_PERSON_PASSWORD);
             statement.setString(1, person.getPassword());
             statement.setLong(2, person.getIdPerson());
             if (statement.executeUpdate() > 0) {
                 logger.debug("Successfully updated person password");
+                connection.commit();
                 return true;
             }
         } catch (SQLException e) {
             logger.error("SQLException thrown when try to change person password: " + e);
+            rollback(connection);
         } finally {
             DatabaseManager.closeAll(connection, statement, null);
         }
@@ -384,6 +397,7 @@ public class MySqlPersonDao implements PersonDao {
         statement = null;
         connection = DatabaseManager.getConnection();
         try {
+            connection.setAutoCommit(false);
             statement = connection.prepareStatement(UPDATE_CHAMBER);
             Long id = patient.getIdChamber();
             if (id == null) {
@@ -394,16 +408,26 @@ public class MySqlPersonDao implements PersonDao {
             statement.setLong(2, patient.getIdPerson());
             if (statement.executeUpdate() > 0) {
                 logger.debug("Person was discharged successfully ");
+                connection.commit();
                 return true;
             }
         } catch (SQLException e) {
             logger.error("SQLException thrown when try to discharge patient: " + e);
+            rollback(connection);
         } finally {
             DatabaseManager.closeAll(connection, statement, null);
         }
 
         logger.debug("Patient was not discharged " + patient);
         return false;
+    }
+
+    private void rollback(Connection connection) {
+        try {
+            connection.rollback();
+        } catch (SQLException e) {
+            logger.error("rollback error");
+        }
     }
 
 }

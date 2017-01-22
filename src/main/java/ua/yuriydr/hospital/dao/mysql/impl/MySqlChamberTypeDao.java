@@ -145,15 +145,18 @@ public class MySqlChamberTypeDao implements ChamberTypeDao {
         connection = DatabaseManager.getConnection();
 
         try {
+            connection.setAutoCommit(false);
             statement = connection.prepareStatement(DELETE_CHAMMER_TYPE);
             statement.setLong(1, chamberType.getIdChamberType());
 
             if (statement.executeUpdate() > 0) {
                 logger.debug("The chamber type deleted successfully");
+                connection.commit();
                 return true;
             }
         } catch (SQLException e) {
             logger.error("SQLException thrown when try to delete chamber type: " + e);
+            rollback(connection);
         } finally {
             DatabaseManager.closeAll(connection, statement, null);
         }
@@ -171,6 +174,7 @@ public class MySqlChamberTypeDao implements ChamberTypeDao {
         ResultSet rs;
 
         try {
+            connection.setAutoCommit(false);
             statement = connection.prepareStatement(INSERT_CHAMBER_TYPE, Statement.RETURN_GENERATED_KEYS);
             statement.setString(1, chamberType.getChamberName());
             if (statement.executeUpdate() > 0) {
@@ -178,16 +182,26 @@ public class MySqlChamberTypeDao implements ChamberTypeDao {
                 if (rs.next()) {
                     chamberType.setIdChamberType(rs.getLong(COLUMN_ID_CHAMBER_TYPE));
                     logger.debug("Chamber type added successfully " + chamberType);
+                    connection.commit();
                     return true;
                 }
             }
         } catch (SQLException e) {
             logger.error("SQLException thrown when try to insert chamber type: " + e);
+            rollback(connection);
         } finally {
             DatabaseManager.closeAll(connection, statement, null);
         }
 
         logger.debug("The chamber type was not inserted " + chamberType);
         return false;
+    }
+
+    private void rollback(Connection connection) {
+        try {
+            connection.rollback();
+        } catch (SQLException e) {
+            logger.error("rollback error");
+        }
     }
 }

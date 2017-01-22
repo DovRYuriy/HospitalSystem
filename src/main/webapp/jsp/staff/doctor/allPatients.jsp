@@ -60,14 +60,21 @@
                             <td>${item.phone}</td>
                             <td>${item.email}</td>
                             <td>
-                                <form name="setNewDiagnosis" method="GET"
-                                      action="${pageContext.request.contextPath}/controller/">
-                                    <input type="hidden" name="command" value="redirect"/>
-                                    <input type="hidden" name="redirectTo" value="setDiagnosisPage"/>
-                                    <input type="hidden" name="id" value="${item.idPerson}"/>
-                                    <input type="submit" name="goToAddDiagnosis"
-                                           value="<fmt:message key='message.set.diagnosis'/>"/>
-                                </form>
+                                <c:choose>
+                                    <c:when test="${empty sessionScope.blockRegistration}">
+                                        <form name="setNewDiagnosis" method="GET"
+                                              action="${pageContext.request.contextPath}/controller/">
+                                            <input type="hidden" name="command" value="redirect"/>
+                                            <input type="hidden" name="redirectTo" value="setDiagnosisPage"/>
+                                            <input type="hidden" name="id" value="${item.idPerson}"/>
+                                            <input type="submit" name="goToAddDiagnosis"
+                                                   value="<fmt:message key='message.set.diagnosis'/>"/>
+                                        </form>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <fmt:message key="message.no.free.chambers"/>
+                                    </c:otherwise>
+                                </c:choose>
                             </td>
                         </tr>
                     </c:forEach>

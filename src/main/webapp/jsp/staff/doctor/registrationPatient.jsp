@@ -92,8 +92,16 @@
             <br/>
             <br/>
 
-            <textarea rows="4" cols="50" name="description" form="usrform"><fmt:message
-                    key="message.diagnosis.description"/></textarea><br/><br/>
+            <textarea rows="4" cols="50" name="description" form="usrform">
+                <c:choose>
+                    <c:when test="${empty sessionScope.diagnosis.description}">
+                        <fmt:message key="message.diagnosis.description"/>
+                    </c:when>
+                    <c:otherwise>
+                        ${sessionScope.diagnosis.description}
+                    </c:otherwise>
+                </c:choose>
+            </textarea><br/><br/>
 
             <input type="text" name="drugs" value="${sessionScope.prescription.drugs}"
                    placeholder="<fmt:message key='message.prescription.drugs'/>"/><br/><br/>

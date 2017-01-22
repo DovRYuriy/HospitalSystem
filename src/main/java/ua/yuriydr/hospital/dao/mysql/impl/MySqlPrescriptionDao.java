@@ -119,6 +119,7 @@ public class MySqlPrescriptionDao implements PrescriptionDao {
         statement = null;
         connection = DatabaseManager.getConnection();
         try {
+            connection.setAutoCommit(false);
             statement = connection.prepareStatement(UPDATE_PRESCRIPTION);
             statement.setString(1, prescription.getDrugs());
             statement.setString(2, prescription.getProcedure());
@@ -126,10 +127,12 @@ public class MySqlPrescriptionDao implements PrescriptionDao {
             statement.setLong(4, prescription.getIdPrescription());
             if (statement.executeUpdate() > 0) {
                 logger.debug("Prescription was updated successfully");
+                connection.commit();
                 return true;
             }
         } catch (SQLException e) {
             logger.error("SQLException thrown when try to update prescription: " + e);
+            rollback(connection);
         } finally {
             DatabaseManager.closeAll(connection, statement, null);
         }
@@ -145,14 +148,17 @@ public class MySqlPrescriptionDao implements PrescriptionDao {
         connection = DatabaseManager.getConnection();
 
         try {
+            connection.setAutoCommit(false);
             statement = connection.prepareStatement(DELETE_PRESCRIPTION);
             statement.setLong(1, prescription.getIdPrescription());
             if (statement.executeUpdate() > 0) {
                 logger.debug("Prescription was deleted successfully");
+                connection.commit();
                 return true;
             }
         } catch (SQLException e) {
             logger.error("SQLException thrown when try to delete prescription: " + e);
+            rollback(connection);
         } finally {
             DatabaseManager.closeAll(connection, statement, null);
         }
@@ -169,6 +175,7 @@ public class MySqlPrescriptionDao implements PrescriptionDao {
         ResultSet rs;
 
         try {
+            connection.setAutoCommit(false);
             statement = connection.prepareStatement(INSERT_PRESCRIPTION, Statement.RETURN_GENERATED_KEYS);
             statement.setString(1, prescription.getDrugs());
             statement.setString(2, prescription.getProcedure());
@@ -178,11 +185,13 @@ public class MySqlPrescriptionDao implements PrescriptionDao {
                 if (rs.next()) {
                     prescription.setIdPrescription(rs.getLong(COLUMN_ID_PRESCRIPTION));
                     logger.debug("Prescription added successfully " + prescription);
+                    connection.commit();
                     return true;
                 }
             }
         } catch (SQLException e) {
             logger.error("SQLException thrown when try to insert prescription: " + e);
+            rollback(connection);
         } finally {
             DatabaseManager.closeAll(connection, statement, null);
         }
@@ -191,4 +200,11 @@ public class MySqlPrescriptionDao implements PrescriptionDao {
         return false;
     }
 
+    private void rollback(Connection connection) {
+        try {
+            connection.rollback();
+        } catch (SQLException e) {
+            logger.error("rollback error");
+        }
+    }
 }

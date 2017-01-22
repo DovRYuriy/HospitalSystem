@@ -57,10 +57,13 @@ public class SetDiagnosisCommand implements Command {
             personDiagnosis.setPatient(person);
         }
 
-
+        boolean invalid = false;
         Diagnosis diagnosis = new Diagnosis();
         diagnosis.setName(request.getParameter("diagnosis"));
-        diagnosis.setDescription(request.getParameter("description"));
+        if(diagnosis.getName().isEmpty()){
+            invalid = true;
+        }
+        diagnosis.setDescription(request.getParameter("description").trim());
 
         Prescription prescription = new Prescription();
         prescription.setDrugs(request.getParameter("drugs"));
@@ -78,6 +81,13 @@ public class SetDiagnosisCommand implements Command {
         personDiagnosis.setPrescription(prescription);
         personDiagnosis.setDate(new Timestamp(System.currentTimeMillis()));
         personDiagnosis.setDischargeDate(null);
+
+        if(invalid){
+            session.setAttribute("prescript", prescription);
+            session.setAttribute("diagnosis", diagnosis);
+            session.setAttribute("incorrectDiagnosis", "incorrectDiagnosis");
+            return (String) session.getAttribute("currentPage");
+        }
 
         PersonDiagnosisService personDiagnosisService = ServiceFactory.getPersonDiagnosisService();
         if (personDiagnosisService.insertPatientDiagnosis(personDiagnosis)) {
@@ -98,7 +108,9 @@ public class SetDiagnosisCommand implements Command {
             Command redirect = CommandHelper.getInstance().defineCommand("redirect");
             return redirect.execute(request, response);
         }
-
+        session.removeAttribute("prescript");
+        session.removeAttribute("diagnosis");
+        session.removeAttribute("incorrectDiagnosis");
         session.setAttribute("currentPage", page);
         return page;
     }
