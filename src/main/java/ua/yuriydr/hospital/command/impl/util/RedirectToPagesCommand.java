@@ -136,10 +136,7 @@ public class RedirectToPagesCommand implements Command {
         }
 
         PersonService personService = ServiceFactory.getPersonService();
-        List<Person> nurses = personService.findAllByRole("nurse");
-        for (Person nurse : nurses) {
-            doctors.add(nurse);
-        }
+        doctors.addAll(personService.findAllByRole("nurse"));
 
         logger.debug(doctors);
         session.setAttribute("patientStaffList", doctors);
@@ -194,15 +191,11 @@ public class RedirectToPagesCommand implements Command {
         Person doc = (Person) session.getAttribute("user");
 
         PersonDiagnosisService personDiagnosisService = ServiceFactory.getPersonDiagnosisService();
-        List<PersonDiagnosis> personDiagnoses = personDiagnosisService.findAllByStaffId(doc.getIdPerson());
+        List<PersonDiagnosis> personDiagnoses = personDiagnosisService.findAllOpenByStaffId(doc.getIdPerson());
 
         Set<Person> patients = new HashSet<>();
         for (PersonDiagnosis personDiagnosis : personDiagnoses) {
-            if (personDiagnosis.getPatient().getIdChamber() != 0) {
-                if (personDiagnosis.getDischargeDate() == null) {
-                    patients.add(personDiagnosis.getPatient());
-                }
-            }
+            patients.add(personDiagnosis.getPatient());
         }
 
         ChamberService chamberService = ServiceFactory.getChamberService();
@@ -213,6 +206,7 @@ public class RedirectToPagesCommand implements Command {
             session.removeAttribute("blockRegistration");
         }
 
+        session.removeAttribute("removeFailed");
         session.removeAttribute("newPerson");
         session.removeAttribute("notFound");
         session.removeAttribute("person");
@@ -230,15 +224,20 @@ public class RedirectToPagesCommand implements Command {
         HttpSession session = request.getSession();
 
         Long idPatient = Long.valueOf(request.getParameter("id"));
+        Person person = ServiceFactory.getPersonService().findPersonById(idPatient);
+        if (person == null) {
+            session.setAttribute("notFound", "notFound");
+        } else {
+            List<PersonDiagnosis> personDiagnosisList = ServiceFactory.getPersonDiagnosisService().findAllByPatientId(idPatient);
 
-        PersonDiagnosisService personDiagnosisService = ServiceFactory.getPersonDiagnosisService();
-        List<PersonDiagnosis> personDiagnosisList = personDiagnosisService.findAllByPatientId(idPatient);
-        personDiagnosisList.sort((o1, o2) -> o2.getDate().compareTo(o1.getDate()));
+            personDiagnosisList.sort((o1, o2) -> o2.getDate().compareTo(o1.getDate()));
 
-        PersonDiagnosis last = personDiagnosisList.get(0);
+            PersonDiagnosis last = personDiagnosisList.get(0);
 
-        logger.debug(last);
-        session.setAttribute("personDiagnosis", last);
+            logger.debug(last);
+            session.setAttribute("personDiagnosis", last);
+        }
+
     }
 
     private void fillEditPatientPage(HttpServletRequest request) {
@@ -248,20 +247,23 @@ public class RedirectToPagesCommand implements Command {
         Person doc = (Person) session.getAttribute("user");
 
         Long idPatient = Long.valueOf(request.getParameter("id"));
-        PersonService personService = ServiceFactory.getPersonService();
-        Person person = personService.findPersonById(idPatient);
+        Person person = ServiceFactory.getPersonService().findPersonById(idPatient);
         if (person == null) {
             session.setAttribute("notFound", "notFound");
         } else {
             session.setAttribute("person", person);
-            PersonDiagnosisService personDiagnosisService = ServiceFactory.getPersonDiagnosisService();
-            List<PersonDiagnosis> personDiagnosisList = personDiagnosisService.findAllByPatientId(idPatient);
-            Iterator iterator = personDiagnosisList.listIterator();
-            while (iterator.hasNext()) {
-                PersonDiagnosis personDiagnosis = (PersonDiagnosis) iterator.next();
-                if (!personDiagnosis.getDoctor().getIdPerson().equals(doc.getIdPerson())) {
-                    iterator.remove();
+
+            List<PersonDiagnosis> personDiagnosisList = ServiceFactory.getPersonDiagnosisService()
+                    .findAllByPatientAndDoctorId(idPatient, doc.getIdPerson());
+
+            int openPersonDiagnoses = 0;
+            for (PersonDiagnosis personDiagnosis : personDiagnosisList) {
+                if (personDiagnosis.getDischargeDate() == null) {
+                    openPersonDiagnoses++;
                 }
+            }
+            if(openPersonDiagnoses == 1){
+                session.setAttribute("removeNotAllowed", "removeNotAllowed");
             }
 
             Collections.reverse(personDiagnosisList);
@@ -277,15 +279,7 @@ public class RedirectToPagesCommand implements Command {
 
         HttpSession session = request.getSession();
 
-        PersonDiagnosisService personDiagnosisService = ServiceFactory.getPersonDiagnosisService();
-        List<PersonDiagnosis> personDiagnosisList = personDiagnosisService.findAllForNurse();
-        Iterator iterator = personDiagnosisList.listIterator();
-        while (iterator.hasNext()) {
-            PersonDiagnosis personDiagnosis = (PersonDiagnosis) iterator.next();
-            if (personDiagnosis.getPatient().getIdChamber() == 0 || personDiagnosis.getDischargeDate() != null) {
-                iterator.remove();
-            }
-        }
+        List<PersonDiagnosis> personDiagnosisList = ServiceFactory.getPersonDiagnosisService().findAllForNurse();
         personDiagnosisList.sort((o1, o2) -> o2.getDate().compareTo(o1.getDate()));
 
         logger.debug(personDiagnosisList);
@@ -317,15 +311,8 @@ public class RedirectToPagesCommand implements Command {
     private void fillAllPatientsPage(HttpServletRequest request) {
         HttpSession session = request.getSession();
 
-        PersonService personService = ServiceFactory.getPersonService();
-        List<Person> personList = personService.findAllByRole("patient");
-        Iterator iterator = personList.listIterator();
-        while (iterator.hasNext()) {
-            Person person = (Person) iterator.next();
-            if (person.getIdChamber() != 0) {
-                iterator.remove();
-            }
-        }
+        List<Person> personList = ServiceFactory.getPersonService().findAllHealthyPatients();
+
         session.setAttribute("patients", personList);
     }
 
@@ -346,4 +333,5 @@ public class RedirectToPagesCommand implements Command {
             session.setAttribute("chambers", chambers);
         }
     }
+
 }

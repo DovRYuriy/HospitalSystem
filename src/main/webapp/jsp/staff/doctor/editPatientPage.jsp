@@ -34,6 +34,7 @@
         <c:choose>
             <c:when test="${empty sessionScope.notFound}">
                 <h3><fmt:message key="message.doctor.patient.service"/>:</h3>
+                <h3>${sessionScope.person.name} ${sessionScope.person.surname}</h3>
                 <h4><fmt:message key="message.chamber"/> № ${sessionScope.chamber.number} </h4>
                 <table border="1px">
                     <tr>
@@ -94,7 +95,8 @@
                                     ${item.prescription.operation}<br/>
                                 <c:if test="${empty item.dischargeDate}">
                                     <c:if test="${not empty item.prescription.operation}">
-                                        <form name="makeOperation" action="${pageContext.request.contextPath}/controller/"
+                                        <form name="makeOperation"
+                                              action="${pageContext.request.contextPath}/controller/"
                                               method="POST">
                                             <input type="hidden" name="command" value="makeStaffAction"/>
                                             <input type="hidden" name="whatAction" value="operation"/>
@@ -107,18 +109,21 @@
                                 </c:if>
                             </td>
                             <td>
-                                <c:if test="${empty item.dischargeDate}">
-                                    <form name="removeForm" action="${pageContext.request.contextPath}/controller/"
-                                          method="POST">
-                                        <input type="hidden" name="command" value="removePersonDiagnosis"/>
-                                        <input type="hidden" name="idPatient" value="${item.patient.idPerson}"/>
-                                        <input type="hidden" name="idStaff" value="${item.doctor.idPerson}"/>
-                                        <input type="hidden" name="idDiagnosis" value="${item.diagnosis.idDiagnosis}"/>
-                                        <input type="hidden" name="idPrescription"
-                                               value="${item.prescription.idPrescription}"/>
-                                        <input type="submit" name="submitRemove"
-                                               value="<fmt:message key='message.crud.remove'/>">
-                                    </form>
+                                <c:if test="${empty sessionScope.removeNotAllowed}">
+                                    <c:if test="${empty item.dischargeDate}">
+                                        <form name="removeForm" action="${pageContext.request.contextPath}/controller/"
+                                              method="POST">
+                                            <input type="hidden" name="command" value="removePersonDiagnosis"/>
+                                            <input type="hidden" name="idPatient" value="${item.patient.idPerson}"/>
+                                            <input type="hidden" name="idStaff" value="${item.doctor.idPerson}"/>
+                                            <input type="hidden" name="idDiagnosis"
+                                                   value="${item.diagnosis.idDiagnosis}"/>
+                                            <input type="hidden" name="idPrescription"
+                                                   value="${item.prescription.idPrescription}"/>
+                                            <input type="submit" name="submitRemove"
+                                                   value="<fmt:message key='message.crud.remove'/>">
+                                        </form>
+                                    </c:if>
                                 </c:if>
                             </td>
                         </tr>

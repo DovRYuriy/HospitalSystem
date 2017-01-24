@@ -24,18 +24,35 @@ public class MySqlPersonDiagnosisDao implements PersonDiagnosisDao {
             "LEFT JOIN hospital.diagnosis d ON (pd.id_diagnosis=d.id_diagnosis) " +
             "LEFT JOIN hospital.prescription p ON (pd.id_prescription=p.id_prescription)" +
             "WHERE pd.id_patient = ?";
-    private static final String FIND_ALL_PERSON_DIAGNOSIS_BY_STAFF_ID = "SELECT pd.id_patient, pd.id_staff, pd.id_diagnosis, d.diagnosis_name, d.description, " +
+
+    private static final String FIND_ALL_PERSON_DIAGNOSIS_BY_PATIENT_STAFF_ID = "SELECT pd.id_patient, pd.id_staff, pd.id_diagnosis, d.diagnosis_name, d.description, " +
             "pd.id_prescription, p.drugs, p.procedure, p.operation, pd.date, pd.discharge_date " +
             "FROM hospital.person_diagnosis pd " +
             "LEFT JOIN hospital.diagnosis d ON (pd.id_diagnosis=d.id_diagnosis) " +
             "LEFT JOIN hospital.prescription p ON (pd.id_prescription=p.id_prescription)" +
-            "WHERE pd.id_staff = ?";
+            "WHERE pd.id_patient = ? AND pd.id_staff = ?";
+
+    private static final String FIND_ALL_PERSON_DIAGNOSIS_BY_STAFF_ID = "SELECT pd.id_patient, pd.id_staff, pd.id_diagnosis, d.diagnosis_name, d.description, " +
+            "pd.id_prescription, p.drugs, p.procedure, p.operation, pd.date, pd.discharge_date " +
+            "FROM hospital.person_diagnosis pd " +
+            "LEFT JOIN hospital.diagnosis d ON (pd.id_diagnosis=d.id_diagnosis) " +
+            "LEFT JOIN hospital.prescription p ON (pd.id_prescription=p.id_prescription) " +
+            "WHERE pd.id_staff = ? ";
+
+    private static final String FIND_ALL_OPEN_PERSON_DIAGNOSIS_BY_STAFF_ID = "SELECT pd.id_patient, pd.id_staff, pd.id_diagnosis, d.diagnosis_name, d.description, " +
+            "pd.id_prescription, p.drugs, p.procedure, p.operation, pd.date, pd.discharge_date " +
+            "FROM hospital.person_diagnosis pd " +
+            "LEFT JOIN hospital.diagnosis d ON (pd.id_diagnosis=d.id_diagnosis) " +
+            "LEFT JOIN hospital.prescription p ON (pd.id_prescription=p.id_prescription) " +
+            "WHERE pd.id_staff = ? " +
+            "AND pd.discharge_date IS NULL";
 
     private static final String FIND_ALL_PERSON_DIAGNOSIS = "SELECT pd.id_patient, pd.id_staff, pd.id_diagnosis, d.diagnosis_name, d.description, " +
             "pd.id_prescription, p.drugs, p.procedure, p.operation, pd.date, pd.discharge_date " +
             "FROM hospital.person_diagnosis pd " +
             "LEFT JOIN hospital.diagnosis d ON (pd.id_diagnosis=d.id_diagnosis) " +
-            "LEFT JOIN hospital.prescription p ON (pd.id_prescription=p.id_prescription)";
+            "LEFT JOIN hospital.prescription p ON (pd.id_prescription=p.id_prescription) " +
+            "WHERE pd.discharge_date IS NULL";
 
     private static final String UPDATE_PERSON_DIAGNOSIS = "UPDATE hospital.person_diagnosis SET date = ?, discharge_date = ?" +
             "WHERE (id_patient = ? && id_staff = ? &&" + " id_diagnosis = ? && id_prescription = ?)";
@@ -118,6 +135,35 @@ public class MySqlPersonDiagnosisDao implements PersonDiagnosisDao {
     public List<PersonDiagnosis> findAllByStaffId(Long idStaff) {
         logger.debug("Try to find all person diagnosis by staff id " + idStaff);
         return findAll(FIND_ALL_PERSON_DIAGNOSIS_BY_STAFF_ID, idStaff);
+    }
+
+    @Override
+    public List<PersonDiagnosis> findAllOpenByStaffId(Long idStaff) {
+        logger.debug("Try to find all open person diagnosis by staff id " + idStaff);
+        return findAll(FIND_ALL_OPEN_PERSON_DIAGNOSIS_BY_STAFF_ID, idStaff);
+    }
+
+    @Override
+    public List<PersonDiagnosis> findAllByPatientAndDoctorId(Long idPatient, Long idDoctor) {
+        ResultSet rs = null;
+        List<PersonDiagnosis> personDiagnoses = new ArrayList<>();
+        connection = DatabaseManager.getConnection();
+
+        try {
+            statement = connection.prepareStatement(FIND_ALL_PERSON_DIAGNOSIS_BY_PATIENT_STAFF_ID);
+            statement.setLong(1, idPatient);
+            statement.setLong(2, idDoctor);
+            rs = statement.executeQuery();
+            while (rs.next()) {
+                personDiagnoses.add(createPatientDiagnosis(rs));
+            }
+            logger.debug("All person diagnoses was found " + personDiagnoses);
+        } catch (SQLException e) {
+            logger.error("SQLException thrown when try to find person diagnoses: " + e);
+        } finally {
+            DatabaseManager.closeAll(connection, statement, rs);
+        }
+        return personDiagnoses;
     }
 
     @Override

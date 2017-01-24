@@ -42,6 +42,7 @@ public class RemovePersonCommand implements Command {
             for (PersonDiagnosis personDiagnosis : personDiagnosisList) {
                 if (personDiagnosis.getDischargeDate() == null) {
                     openPersonDiagnosis = true;
+                    break;
                 }
             }
             if (openPersonDiagnosis) {

@@ -25,6 +25,11 @@ public class MySqlPersonDao implements PersonDao {
             "LEFT JOIN hospital.role r ON(p.fk_role = r.id_role)" +
             "WHERE r.role_name = ?";
 
+    private static final String FIND_ALL_HEALTHY_PATIENTS = "SELECT DISTINCT p.id_person, p.name, p.surname, p.birthday, p.phone, p.email, p.password, p.fk_role, r.role_name, p.fk_chamber " +
+            "FROM hospital.person p " +
+            "LEFT JOIN hospital.role r ON(p.fk_role = r.id_role)" +
+            "WHERE p.fk_chamber IS NULL ";
+
     private static final String FIND_PERSON_BY_ID = "SELECT p.id_person, p.name, p.surname, p.birthday, p.phone, p.email, p.password, p.fk_role, r.role_name, p.fk_chamber " +
             "FROM hospital.person p " +
             "LEFT JOIN hospital.role r ON(p.fk_role = r.id_role)" +
@@ -148,6 +153,31 @@ public class MySqlPersonDao implements PersonDao {
 
         } catch (SQLException e) {
             logger.error("SQLException thrown when try to find all persons: " + e);
+        } finally {
+            DatabaseManager.closeAll(connection, statement, rs);
+        }
+        return persons;
+    }
+
+    @Override
+    public List<Person> findAllHealthyPatients() {
+        logger.debug("Try to find all healthy patients");
+
+        ResultSet rs = null;
+        statement = null;
+        List<Person> persons = new ArrayList<>();
+        connection = DatabaseManager.getConnection();
+
+        try {
+            statement = connection.prepareStatement(FIND_ALL_HEALTHY_PATIENTS);
+            rs = statement.executeQuery();
+            while (rs.next()) {
+                persons.add(createPerson(rs));
+            }
+            logger.debug("Persons were found " + persons);
+
+        } catch (SQLException e) {
+            logger.error("SQLException thrown when try to find healthy persons: " + e);
         } finally {
             DatabaseManager.closeAll(connection, statement, rs);
         }

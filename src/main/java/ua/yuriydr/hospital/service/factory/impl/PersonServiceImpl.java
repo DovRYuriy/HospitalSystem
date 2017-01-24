@@ -81,6 +81,11 @@ public class PersonServiceImpl implements PersonService {
     }
 
     @Override
+    public List<Person> findAllHealthyPatients() {
+        return personDao.findAllHealthyPatients();
+    }
+
+    @Override
     public List<Person> findAllInSpecificChamber(Long idChamber) {
         return personDao.findAllInSpecificChamber(idChamber);
     }

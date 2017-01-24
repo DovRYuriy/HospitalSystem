@@ -25,6 +25,13 @@ public interface PersonService {
     List<Person> findAllByRole(String role);
 
     /**
+     * Return a list of healthy persons
+     *
+     * @return a list of healthy persons
+     */
+    List<Person> findAllHealthyPatients();
+
+    /**
      * Returns a list of persons by their role.
      *
      * @param idChamber chamber's id.

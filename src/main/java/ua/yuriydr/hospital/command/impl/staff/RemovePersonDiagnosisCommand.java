@@ -54,6 +54,16 @@ public class RemovePersonDiagnosisCommand implements Command {
             PersonDiagnosisService personDiagnosisService = ServiceFactory.getPersonDiagnosisService();
             personDiagnosisService.deletePatientDiagnosis(personDiagnosis);
 
+            int openPersonDiagnoses = 0;
+            for (PersonDiagnosis pd : personDiagnoses) {
+                if (pd.getDischargeDate() == null) {
+                    openPersonDiagnoses++;
+                }
+            }
+            if(openPersonDiagnoses == 1){
+                session.setAttribute("removeNotAllowed", "removeNotAllowed");
+            }
+
             session.setAttribute("patientDiagnosis", personDiagnoses);
         } else {
             logger.debug("failed");

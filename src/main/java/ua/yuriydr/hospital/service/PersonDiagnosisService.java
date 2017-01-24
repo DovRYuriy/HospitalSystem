@@ -27,6 +27,23 @@ public interface PersonDiagnosisService {
     List<PersonDiagnosis> findAllByStaffId(Long idStaff);
 
     /**
+     * Returns a list of open person's diagnoses by doctor's id.
+     *
+     * @param idStaff doctor's id in system.
+     * @return a list of open persons's diagnoses by person id.
+     */
+    List<PersonDiagnosis> findAllOpenByStaffId(Long idStaff);
+
+    /**
+     * Returns a list of person's diagnoses by his id and doctor's id.
+     *
+     * @param idPatient patient's id in system.
+     * @param idDoctor doctor's id in system.
+     * @return a list of persons's diagnoses by person id.
+     */
+    List<PersonDiagnosis> findAllByPatientAndDoctorId(Long idPatient, Long idDoctor);
+
+    /**
      * Returns a list of person's diagnoses for nurse.
      *
      * @return a list of persons's diagnoses for nurse.

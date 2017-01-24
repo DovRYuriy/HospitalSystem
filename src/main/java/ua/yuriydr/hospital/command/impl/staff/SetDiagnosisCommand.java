@@ -104,6 +104,7 @@ public class SetDiagnosisCommand implements Command {
         String page;
         if (person == null) {
             page = PagesManager.getProperty("path.page.editPatientPage");
+            session.removeAttribute("removeNotAllowed");
         } else {
             Command redirect = CommandHelper.getInstance().defineCommand("redirect");
             return redirect.execute(request, response);

@@ -3,6 +3,7 @@ package ua.yuriydr.hospital.service.factory.impl;
 import ua.yuriydr.hospital.dao.PersonDao;
 import ua.yuriydr.hospital.dao.PersonDiagnosisDao;
 import ua.yuriydr.hospital.dao.mysql.MySqlDaoFactory;
+import ua.yuriydr.hospital.model.Person;
 import ua.yuriydr.hospital.model.PersonDiagnosis;
 import ua.yuriydr.hospital.service.PersonDiagnosisService;
 
@@ -35,9 +36,10 @@ public class PersonDiagnosisServiceImpl implements PersonDiagnosisService {
 
     @Override
     public List<PersonDiagnosis> findAllByPatientId(Long idPatient) {
+        Person patient = personDao.findPersonById(idPatient);
         List<PersonDiagnosis> personDiagnoses = personDiagnosisDao.findAllByPatientId(idPatient);
         for (PersonDiagnosis personDiagnosis : personDiagnoses) {
-            personDiagnosis.setPatient(personDao.findPersonById(idPatient));
+            personDiagnosis.setPatient(patient);
             personDiagnosis.setDoctor(personDao.findPersonById(personDiagnosis.getDoctor().getIdPerson()));
         }
         return personDiagnoses;
@@ -50,13 +52,36 @@ public class PersonDiagnosisServiceImpl implements PersonDiagnosisService {
 
     @Override
     public List<PersonDiagnosis> findAllByStaffId(Long idStaff) {
+        Person staff = personDao.findPersonById(idStaff);
         List<PersonDiagnosis> personDiagnoses = personDiagnosisDao.findAllByStaffId(idStaff);
         for (PersonDiagnosis personDiagnosis : personDiagnoses) {
             personDiagnosis.setPatient(personDao.findPersonById(personDiagnosis.getPatient().getIdPerson()));
-            personDiagnosis.setDoctor(personDao.findPersonById(idStaff));
+            personDiagnosis.setDoctor(staff);
         }
         return personDiagnoses;
+    }
 
+    @Override
+    public List<PersonDiagnosis> findAllOpenByStaffId(Long idStaff) {
+        Person staff = personDao.findPersonById(idStaff);
+        List<PersonDiagnosis> personDiagnoses = personDiagnosisDao.findAllOpenByStaffId(idStaff);
+        for (PersonDiagnosis personDiagnosis : personDiagnoses) {
+            personDiagnosis.setPatient(personDao.findPersonById(personDiagnosis.getPatient().getIdPerson()));
+            personDiagnosis.setDoctor(staff);
+        }
+        return personDiagnoses;
+    }
+
+    @Override
+    public List<PersonDiagnosis> findAllByPatientAndDoctorId(Long idPatient, Long idDoctor) {
+        Person patient = personDao.findPersonById(idPatient);
+        Person doctor = personDao.findPersonById(idDoctor);
+        List<PersonDiagnosis> personDiagnoses = personDiagnosisDao.findAllByPatientAndDoctorId(idPatient, idDoctor);
+        for (PersonDiagnosis personDiagnosis : personDiagnoses) {
+            personDiagnosis.setPatient(patient);
+            personDiagnosis.setDoctor(doctor);
+        }
+        return personDiagnoses;
     }
 
     @Override

@@ -44,7 +44,6 @@
                     <tr>
                         <th><fmt:message key="message.nurse.patient"/></th>
                         <th><fmt:message key="message.patient.date"/></th>
-                        <th><fmt:message key="message.patient.dischargedate"/></th>
                         <th><fmt:message key="message.patient.diagnosis"/></th>
                         <th><fmt:message key="message.prescription.drugs"/></th>
                         <th><fmt:message key="message.prescription.procedure"/></th>
@@ -56,11 +55,6 @@
                                     ${item.patient.surname}
                             </td>
                             <td><dt:dateFormat date="${item.date}" locale="${sessionScope.language}"/></td>
-                            <td>
-                                <c:if test="${not empty item.dischargeDate}">
-                                    <dt:dateFormat date="${item.dischargeDate}" locale="${sessionScope.language}"/>
-                                </c:if>
-                            </td>
                             <td>
                                     ${item.diagnosis.name}<br/>
                                     ${item.diagnosis.description}
