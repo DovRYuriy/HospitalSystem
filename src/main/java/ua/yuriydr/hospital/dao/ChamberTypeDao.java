@@ -1,7 +1,7 @@
 package ua.yuriydr.hospital.dao;
 
 import ua.yuriydr.hospital.dao.mysql.impl.MySqlChamberTypeDao;
-import ua.yuriydr.hospital.model.ChamberType;
+import ua.yuriydr.hospital.entity.ChamberType;
 
 import java.util.List;
 

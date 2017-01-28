@@ -2,7 +2,7 @@ package ua.yuriydr.hospital.command.impl.util;
 
 import org.apache.log4j.Logger;
 import ua.yuriydr.hospital.command.Command;
-import ua.yuriydr.hospital.model.*;
+import ua.yuriydr.hospital.entity.*;
 import ua.yuriydr.hospital.service.*;
 import ua.yuriydr.hospital.service.factory.ServiceFactory;
 import ua.yuriydr.hospital.service.factory.impl.ChamberServiceImpl;
@@ -19,7 +19,7 @@ public class RedirectToPagesCommand implements Command {
 
     private static final Logger logger = Logger.getLogger(RedirectToPagesCommand.class);
 
-    private Map<String, Consumer<HttpServletRequest>> controllers = new HashMap<>();
+    private final Map<String, Consumer<HttpServletRequest>> controllers = new HashMap<>();
 
     public RedirectToPagesCommand() {
         controllers.put(PagesManager.getProperty("path.page.patientMainPage"), this::fillPatientMainPage);
@@ -43,7 +43,6 @@ public class RedirectToPagesCommand implements Command {
         String req, page;
         HttpSession session = request.getSession();
 
-
         String param = request.getParameter("redirectTo");
         if (param == null) {
             Person person = (Person) session.getAttribute("user");
@@ -53,6 +52,7 @@ public class RedirectToPagesCommand implements Command {
         } else {
             req = "path.page." + param;
         }
+
 
         page = PagesManager.getProperty(req);
         if (!UserUtils.getInstance().hasAccess(request, page)) {
@@ -206,6 +206,7 @@ public class RedirectToPagesCommand implements Command {
             session.removeAttribute("blockRegistration");
         }
 
+        session.removeAttribute("errorPD");
         session.removeAttribute("removeFailed");
         session.removeAttribute("newPerson");
         session.removeAttribute("notFound");
@@ -271,6 +272,7 @@ public class RedirectToPagesCommand implements Command {
 
             ChamberService chamberService = ChamberServiceImpl.getInstance();
             session.setAttribute("chamber", chamberService.findChamberById(personDiagnosisList.get(0).getPatient().getIdChamber()));
+            session.removeAttribute("errorPD");
         }
     }
 

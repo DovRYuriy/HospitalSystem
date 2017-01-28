@@ -1,7 +1,7 @@
 package ua.yuriydr.hospital.dao;
 
 import ua.yuriydr.hospital.dao.mysql.impl.MySqlPersonDiagnosisDao;
-import ua.yuriydr.hospital.model.PersonDiagnosis;
+import ua.yuriydr.hospital.entity.PersonDiagnosis;
 
 import java.util.List;
 
@@ -51,6 +51,14 @@ public interface PersonDiagnosisDao {
      * @return a list of persons's diagnoses for nurse.
      */
     List<PersonDiagnosis> findAllForNurse();
+
+    /**
+     * Returns person diagnosis by id
+     *
+     * @return person diagnosis
+     */
+    PersonDiagnosis findPersonDiagnosis(Long idPatient, Long idStaff, Long idPrescription, Long idDiagnosis);
+
 
     /**
      * Update person's diagnosis.

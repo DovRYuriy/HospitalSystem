@@ -1,6 +1,6 @@
 package ua.yuriydr.hospital.service;
 
-import ua.yuriydr.hospital.model.Role;
+import ua.yuriydr.hospital.entity.Role;
 
 import java.util.List;
 

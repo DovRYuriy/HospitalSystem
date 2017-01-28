@@ -2,7 +2,7 @@ package ua.yuriydr.hospital.service.factory.impl;
 
 import ua.yuriydr.hospital.dao.RoleDao;
 import ua.yuriydr.hospital.dao.mysql.MySqlDaoFactory;
-import ua.yuriydr.hospital.model.Role;
+import ua.yuriydr.hospital.entity.Role;
 import ua.yuriydr.hospital.service.RoleService;
 
 import java.util.List;
@@ -11,7 +11,7 @@ public class RoleServiceImpl implements RoleService {
 
     private static volatile RoleServiceImpl roleService;
 
-    private RoleDao roleDao = MySqlDaoFactory.getRoleDao();
+    private final RoleDao roleDao = MySqlDaoFactory.getRoleDao();
 
     private RoleServiceImpl() {
 

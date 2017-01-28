@@ -2,10 +2,10 @@ package ua.yuriydr.hospital.dao.mysql.impl;
 
 import org.apache.log4j.Logger;
 import ua.yuriydr.hospital.dao.PersonDiagnosisDao;
-import ua.yuriydr.hospital.model.Diagnosis;
-import ua.yuriydr.hospital.model.Person;
-import ua.yuriydr.hospital.model.PersonDiagnosis;
-import ua.yuriydr.hospital.model.Prescription;
+import ua.yuriydr.hospital.entity.Diagnosis;
+import ua.yuriydr.hospital.entity.Person;
+import ua.yuriydr.hospital.entity.PersonDiagnosis;
+import ua.yuriydr.hospital.entity.Prescription;
 import ua.yuriydr.hospital.utils.DatabaseManager;
 
 import java.sql.*;
@@ -38,6 +38,14 @@ public class MySqlPersonDiagnosisDao implements PersonDiagnosisDao {
             "LEFT JOIN hospital.diagnosis d ON (pd.id_diagnosis=d.id_diagnosis) " +
             "LEFT JOIN hospital.prescription p ON (pd.id_prescription=p.id_prescription) " +
             "WHERE pd.id_staff = ? ";
+
+    private static final String FIND_PERSON_DIAGNOSIS = "SELECT pd.id_patient, pd.id_staff, pd.id_diagnosis, d.diagnosis_name, d.description, " +
+            "pd.id_prescription, p.drugs, p.procedure, p.operation, pd.date, pd.discharge_date " +
+            "FROM hospital.person_diagnosis pd " +
+            "LEFT JOIN hospital.diagnosis d ON (pd.id_diagnosis=d.id_diagnosis) " +
+            "LEFT JOIN hospital.prescription p ON (pd.id_prescription=p.id_prescription) " +
+            "WHERE (pd.id_patient = ? && pd.id_staff = ? &&" +
+            " pd.id_prescription = ? && pd.id_diagnosis = ?)";
 
     private static final String FIND_ALL_OPEN_PERSON_DIAGNOSIS_BY_STAFF_ID = "SELECT pd.id_patient, pd.id_staff, pd.id_diagnosis, d.diagnosis_name, d.description, " +
             "pd.id_prescription, p.drugs, p.procedure, p.operation, pd.date, pd.discharge_date " +
@@ -120,7 +128,7 @@ public class MySqlPersonDiagnosisDao implements PersonDiagnosisDao {
             personDiagnosis.setDate(rs.getTimestamp(COLUMN_DATE));
             personDiagnosis.setDischargeDate(rs.getTimestamp(COLUMN_DISCHARGE_DATE));
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Person diagnosis create error");
         }
         return personDiagnosis;
     }
@@ -170,6 +178,37 @@ public class MySqlPersonDiagnosisDao implements PersonDiagnosisDao {
     public List<PersonDiagnosis> findAllForNurse() {
         logger.debug("Try to find all person diagnoses for nurse");
         return findAll(FIND_ALL_PERSON_DIAGNOSIS, null);
+    }
+
+    @Override
+    public PersonDiagnosis findPersonDiagnosis(Long idPatient, Long idStaff, Long idPrescription, Long idDiagnosis) {
+        logger.debug("Try to find person diagnosis");
+
+        PersonDiagnosis personDiagnosis = null;
+        ResultSet rs = null;
+        statement = null;
+        connection = DatabaseManager.getConnection();
+
+        try {
+            statement = connection.prepareStatement(FIND_PERSON_DIAGNOSIS);
+            statement.setLong(1, idPatient);
+            statement.setLong(2, idStaff);
+            statement.setLong(3, idPrescription);
+            statement.setLong(4, idDiagnosis);
+            rs = statement.executeQuery();
+
+            if (rs.next()) {
+                personDiagnosis = createPatientDiagnosis(rs);
+                logger.debug("Patient diagnosis was found successfully " + personDiagnosis);
+            } else {
+                logger.debug("Patient diagnosis was not found");
+            }
+        } catch (SQLException e) {
+            logger.error("Find person diagnosis error: " + e);
+        } finally {
+            DatabaseManager.closeAll(connection, statement, rs);
+        }
+        return personDiagnosis;
     }
 
     private List<PersonDiagnosis> findAll(String query, Long id) {

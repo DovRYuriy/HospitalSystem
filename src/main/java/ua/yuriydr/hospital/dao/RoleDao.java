@@ -1,7 +1,7 @@
 package ua.yuriydr.hospital.dao;
 
 import ua.yuriydr.hospital.dao.mysql.impl.MySqlRoleDao;
-import ua.yuriydr.hospital.model.Role;
+import ua.yuriydr.hospital.entity.Role;
 
 import java.util.List;
 

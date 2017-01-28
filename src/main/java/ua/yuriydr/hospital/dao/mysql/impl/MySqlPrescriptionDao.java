@@ -2,7 +2,7 @@ package ua.yuriydr.hospital.dao.mysql.impl;
 
 import org.apache.log4j.Logger;
 import ua.yuriydr.hospital.dao.PrescriptionDao;
-import ua.yuriydr.hospital.model.Prescription;
+import ua.yuriydr.hospital.entity.Prescription;
 import ua.yuriydr.hospital.utils.DatabaseManager;
 
 import java.sql.*;
@@ -55,7 +55,7 @@ public class MySqlPrescriptionDao implements PrescriptionDao {
             prescription.setProcedure(rs.getString(COLUMN_PROCEDURE));
             prescription.setOperation(rs.getString(COLUMN_OPERATION));
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Prescription entity create error");
         }
         return prescription;
     }

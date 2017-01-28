@@ -1,7 +1,7 @@
 package ua.yuriydr.hospital.service;
 
 
-import ua.yuriydr.hospital.model.PersonDiagnosis;
+import ua.yuriydr.hospital.entity.PersonDiagnosis;
 
 import java.util.List;
 
@@ -49,6 +49,13 @@ public interface PersonDiagnosisService {
      * @return a list of persons's diagnoses for nurse.
      */
     List<PersonDiagnosis> findAllForNurse();
+
+    /**
+     * Returns person diagnosis by id
+     *
+     * @return person diagnosis
+     */
+    PersonDiagnosis findPersonDiagnosis(Long idPatient, Long idStaff, Long idPrescription, Long idDiagnosis);
 
     /**
      * Update person's diagnosis.

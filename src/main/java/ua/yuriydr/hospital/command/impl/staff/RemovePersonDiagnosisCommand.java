@@ -2,7 +2,7 @@ package ua.yuriydr.hospital.command.impl.staff;
 
 import org.apache.log4j.Logger;
 import ua.yuriydr.hospital.command.Command;
-import ua.yuriydr.hospital.model.PersonDiagnosis;
+import ua.yuriydr.hospital.entity.PersonDiagnosis;
 import ua.yuriydr.hospital.service.PersonDiagnosisService;
 import ua.yuriydr.hospital.service.factory.ServiceFactory;
 import ua.yuriydr.hospital.utils.PagesManager;
@@ -11,7 +11,6 @@ import ua.yuriydr.hospital.utils.UserUtils;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.util.Iterator;
 import java.util.List;
 
 public class RemovePersonDiagnosisCommand implements Command {
@@ -35,23 +34,13 @@ public class RemovePersonDiagnosisCommand implements Command {
         Long idDiagnosis = Long.valueOf(request.getParameter("idDiagnosis"));
         Long idPrescription = Long.valueOf(request.getParameter("idPrescription"));
 
-        PersonDiagnosis personDiagnosis = null;
-        Iterator iterator = personDiagnoses.listIterator();
-        while (iterator.hasNext()) {
-            personDiagnosis = (PersonDiagnosis) iterator.next();
-            if (personDiagnosis.getPatient().getIdPerson().equals(idPatient) &&
-                    personDiagnosis.getDoctor().getIdPerson().equals(idStaff) &&
-                    personDiagnosis.getPrescription().getIdPrescription().equals(idPrescription) &&
-                    personDiagnosis.getDiagnosis().getIdDiagnosis().equals(idDiagnosis)) {
-                logger.debug("PersonDiagnosis was found in list");
-                iterator.remove();
-                break;
-            }
-        }
+        PersonDiagnosisService personDiagnosisService = ServiceFactory.getPersonDiagnosisService();
+        PersonDiagnosis personDiagnosis = personDiagnosisService.findPersonDiagnosis(idPatient, idStaff,
+                idPrescription, idDiagnosis);
 
         if (personDiagnosis != null) {
             logger.debug("successful");
-            PersonDiagnosisService personDiagnosisService = ServiceFactory.getPersonDiagnosisService();
+            personDiagnoses.remove(personDiagnosis);
             personDiagnosisService.deletePatientDiagnosis(personDiagnosis);
 
             int openPersonDiagnoses = 0;
@@ -67,7 +56,7 @@ public class RemovePersonDiagnosisCommand implements Command {
             session.setAttribute("patientDiagnosis", personDiagnoses);
         } else {
             logger.debug("failed");
-            session.setAttribute("error", "Error when try to delete person diagnosis");
+            session.setAttribute("errorPD", "Error when try to delete person diagnosis");
         }
 
         return (String) session.getAttribute("currentPage");

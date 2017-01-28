@@ -2,7 +2,7 @@ package ua.yuriydr.hospital.service.factory.impl;
 
 import ua.yuriydr.hospital.dao.PrescriptionDao;
 import ua.yuriydr.hospital.dao.mysql.MySqlDaoFactory;
-import ua.yuriydr.hospital.model.Prescription;
+import ua.yuriydr.hospital.entity.Prescription;
 import ua.yuriydr.hospital.service.PrescriptionService;
 
 import java.util.List;
@@ -11,7 +11,7 @@ public class PrescriptionServiceImpl implements PrescriptionService {
 
     private static volatile PrescriptionServiceImpl prescriptionService;
 
-    private static PrescriptionDao prescriptionDao = MySqlDaoFactory.getPrescriptionDao();
+    private static final PrescriptionDao prescriptionDao = MySqlDaoFactory.getPrescriptionDao();
 
     private PrescriptionServiceImpl() {
 

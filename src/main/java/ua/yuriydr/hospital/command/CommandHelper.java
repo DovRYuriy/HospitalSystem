@@ -32,7 +32,7 @@ public class CommandHelper {
     /**
      * Represents commands map to execute.
      */
-    private Map<String, Command> commands = new HashMap<>();
+    private final Map<String, Command> commands = new HashMap<>();
 
     /**
      * Constructs an map of commands.

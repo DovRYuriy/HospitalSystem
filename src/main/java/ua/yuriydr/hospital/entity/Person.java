@@ -1,4 +1,4 @@
-package ua.yuriydr.hospital.model;
+package ua.yuriydr.hospital.entity;
 
 import java.sql.Date;
 import java.util.ArrayList;

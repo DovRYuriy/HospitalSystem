@@ -2,7 +2,7 @@ package ua.yuriydr.hospital.dao.mysql.impl;
 
 import org.apache.log4j.Logger;
 import ua.yuriydr.hospital.dao.DiagnosisDao;
-import ua.yuriydr.hospital.model.Diagnosis;
+import ua.yuriydr.hospital.entity.Diagnosis;
 import ua.yuriydr.hospital.utils.DatabaseManager;
 
 import java.sql.*;
@@ -53,8 +53,7 @@ public class MySqlDiagnosisDao implements DiagnosisDao {
             diagnosis.setName(rs.getString(COLUMN_DIAGNOSIS_NAME));
             diagnosis.setDescription(rs.getString(COLUMN_DESCRIPTION));
         } catch (SQLException e) {
-            e.printStackTrace();
-            return null;
+            logger.error("Diagnosis entity create error");
         }
         return diagnosis;
     }

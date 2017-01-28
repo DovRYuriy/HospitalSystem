@@ -2,7 +2,7 @@ package ua.yuriydr.hospital.dao;
 
 
 import ua.yuriydr.hospital.dao.mysql.impl.MySqlPrescriptionDao;
-import ua.yuriydr.hospital.model.Prescription;
+import ua.yuriydr.hospital.entity.Prescription;
 
 import java.util.List;
 

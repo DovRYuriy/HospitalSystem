@@ -1,4 +1,4 @@
-package ua.yuriydr.hospital.model;
+package ua.yuriydr.hospital.entity;
 
 import java.io.Serializable;
 import java.sql.Timestamp;

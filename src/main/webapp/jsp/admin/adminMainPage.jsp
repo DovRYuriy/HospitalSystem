@@ -47,46 +47,53 @@
     <div>
         <div>
             <h3><fmt:message key="message.admin.staff"/>:</h3>
-            <div class="errorRemove">
-                <c:if test="${not empty sessionScope.removeFailed}">
-                    <fmt:message key="message.remove.failed"/><br/>
-                </c:if>
-            </div>
-            <table border="2px">
-                <tr>
-                    <th><fmt:message key="message.profile.name"/></th>
-                    <th><fmt:message key="message.profile.surname"/></th>
-                    <th><fmt:message key="message.profile.birthday"/></th>
-                    <th><fmt:message key="message.profile.phone"/></th>
-                    <th><fmt:message key="message.profile.email"/></th>
-                    <th><fmt:message key="message.profile.post"/></th>
-                    <th><fmt:message key="message.crud.edit"/></th>
-                    <th><fmt:message key="message.crud.remove"/></th>
-                </tr>
-                <c:forEach items="${sessionScope.staffInHospital}" var="var">
-                    <tr>
-                        <td>${var.name}</td>
-                        <td>${var.surname}</td>
-                        <td>${var.birthday}</td>
-                        <td>${var.phone}</td>
-                        <td>${var.email}</td>
-                        <td>${var.role.name}</td>
-                        <td>
-                            <a href="?command=redirect&redirectTo=editStaffPage&id=${var.idPerson}"><fmt:message
-                                    key="message.crud.edit"/></a>
-                        </td>
-                        <td>
-                            <form name="removeForm" action="${pageContext.request.contextPath}/controller/"
-                                  method="POST">
-                                <input type="hidden" name="command" value="remove"/>
-                                <input type="hidden" name="id" value="${var.idPerson}"/>
-                                <input type="submit" name="submitRemove"
-                                       value="<fmt:message key='message.crud.remove'/>">
-                            </form>
-                        </td>
-                    </tr>
-                </c:forEach>
-            </table>
+            <c:choose>
+                <c:when test="${not empty sessionScope.staffInHospital}">
+                    <div class="errorRemove">
+                        <c:if test="${not empty sessionScope.removeFailed}">
+                            <fmt:message key="message.remove.failed"/><br/>
+                        </c:if>
+                    </div>
+                    <table border="2px">
+                        <tr>
+                            <th><fmt:message key="message.profile.name"/></th>
+                            <th><fmt:message key="message.profile.surname"/></th>
+                            <th><fmt:message key="message.profile.birthday"/></th>
+                            <th><fmt:message key="message.profile.phone"/></th>
+                            <th><fmt:message key="message.profile.email"/></th>
+                            <th><fmt:message key="message.profile.post"/></th>
+                            <th><fmt:message key="message.crud.edit"/></th>
+                            <th><fmt:message key="message.crud.remove"/></th>
+                        </tr>
+                        <c:forEach items="${sessionScope.staffInHospital}" var="var">
+                            <tr>
+                                <td>${var.name}</td>
+                                <td>${var.surname}</td>
+                                <td>${var.birthday}</td>
+                                <td>${var.phone}</td>
+                                <td>${var.email}</td>
+                                <td>${var.role.name}</td>
+                                <td>
+                                    <a href="?command=redirect&redirectTo=editStaffPage&id=${var.idPerson}"><fmt:message
+                                            key="message.crud.edit"/></a>
+                                </td>
+                                <td>
+                                    <form name="removeForm" action="${pageContext.request.contextPath}/controller/"
+                                          method="POST">
+                                        <input type="hidden" name="command" value="remove"/>
+                                        <input type="hidden" name="id" value="${var.idPerson}"/>
+                                        <input type="submit" name="submitRemove"
+                                               value="<fmt:message key='message.crud.remove'/>">
+                                    </form>
+                                </td>
+                            </tr>
+                        </c:forEach>
+                    </table>
+                </c:when>
+                <c:otherwise>
+                    <fmt:message key="message.admin.staff.empty"/>
+                </c:otherwise>
+            </c:choose>
         </div>
         <div>
             <c:choose>

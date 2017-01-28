@@ -4,7 +4,7 @@ package ua.yuriydr.hospital.service.factory.impl;
 import ua.yuriydr.hospital.dao.ChamberDao;
 import ua.yuriydr.hospital.dao.PersonDao;
 import ua.yuriydr.hospital.dao.mysql.MySqlDaoFactory;
-import ua.yuriydr.hospital.model.Chamber;
+import ua.yuriydr.hospital.entity.Chamber;
 import ua.yuriydr.hospital.service.ChamberService;
 
 import java.util.ArrayList;
@@ -14,8 +14,8 @@ public class ChamberServiceImpl implements ChamberService {
 
     private static volatile ChamberServiceImpl chamberService;
 
-    private static ChamberDao chamberDao = MySqlDaoFactory.getChamberDao();
-    private static PersonDao personDao = MySqlDaoFactory.getPersonDao();
+    private static final ChamberDao chamberDao = MySqlDaoFactory.getChamberDao();
+    private static final PersonDao personDao = MySqlDaoFactory.getPersonDao();
 
     private ChamberServiceImpl() {
 
@@ -63,7 +63,9 @@ public class ChamberServiceImpl implements ChamberService {
     @Override
     public Chamber findChamberById(Long idChamber) {
         Chamber chamber = chamberDao.findChamberById(idChamber);
-        chamber.setPatients(personDao.findAllInSpecificChamber(idChamber));
+        if (chamber != null) {
+            chamber.setPatients(personDao.findAllInSpecificChamber(idChamber));
+        }
         return chamber;
     }
 

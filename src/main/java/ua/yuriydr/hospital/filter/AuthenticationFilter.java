@@ -1,7 +1,7 @@
 package ua.yuriydr.hospital.filter;
 
 
-import ua.yuriydr.hospital.model.Person;
+import ua.yuriydr.hospital.entity.Person;
 import ua.yuriydr.hospital.utils.PagesManager;
 import ua.yuriydr.hospital.utils.UserUtils;
 
@@ -10,7 +10,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.util.Map;
 
 /**
  * This filter used for check that user authenticated.

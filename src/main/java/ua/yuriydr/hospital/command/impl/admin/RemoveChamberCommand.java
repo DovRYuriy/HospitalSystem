@@ -2,9 +2,7 @@ package ua.yuriydr.hospital.command.impl.admin;
 
 import org.apache.log4j.Logger;
 import ua.yuriydr.hospital.command.Command;
-import ua.yuriydr.hospital.command.CommandHelper;
-import ua.yuriydr.hospital.model.Chamber;
-import ua.yuriydr.hospital.model.Person;
+import ua.yuriydr.hospital.entity.Chamber;
 import ua.yuriydr.hospital.service.ChamberService;
 import ua.yuriydr.hospital.service.factory.ServiceFactory;
 import ua.yuriydr.hospital.utils.PagesManager;
@@ -13,7 +11,6 @@ import ua.yuriydr.hospital.utils.UserUtils;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.util.Iterator;
 import java.util.List;
 
 public class RemoveChamberCommand implements Command {
@@ -36,28 +33,29 @@ public class RemoveChamberCommand implements Command {
         List<Chamber> chamberList = (List<Chamber>) session.getAttribute("chambersInHospital");
         Long id = Long.valueOf(request.getParameter("id"));
 
-        Chamber chamber = null;
-        Iterator iterator = chamberList.listIterator();
-        while (iterator.hasNext()) {
-            chamber = (Chamber) iterator.next();
-            if (chamber.getIdChamber().equals(id)) {
-                logger.debug("Found in list");
-                break;
+        ChamberService chamberService = ServiceFactory.getChamberService();
+        Chamber chamber = chamberService.findChamberById(id);
+
+        String page;
+
+        if (chamber != null) {
+            if (chamber.getPatients().size() == 0) {
+                if (chamberService.deleteChamber(chamber)) {
+                    chamberList.remove(chamber);
+                    logger.debug("successful deleted");
+                } else {
+                    logger.debug("unsuccessful deleted");
+                }
+                session.removeAttribute("removeChamberFailed");
+                session.setAttribute("chambersInHospital", chamberList);
+            } else {
+                session.setAttribute("removeChamberFailed", "removeChamberFailed");
             }
+            page = (String) session.getAttribute("currentPage");
+        } else {
+            page = PagesManager.getProperty("path.page.error");
         }
 
-        if (chamber.getPatients().size() == 0) {
-            chamberList.remove(chamber);
-            if (chamberService.deleteChamber(chamber)) {
-                logger.debug("successful deleted");
-            } else {
-                logger.debug("unsuccessful deleted");
-            }
-            session.removeAttribute("removeChamberFailed");
-            session.setAttribute("chambersInHospital", chamberList);
-        } else {
-            session.setAttribute("removeChamberFailed", "removeChamberFailed");
-        }
-        return (String) session.getAttribute("currentPage");
+        return page;
     }
 }

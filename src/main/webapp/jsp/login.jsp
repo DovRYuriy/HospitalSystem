@@ -7,8 +7,8 @@
 <html>
 <head>
     <title><fmt:message key="message.login.title"/></title>
-    <link rel="icon" href="/resources/image/favicon.ico" type="image/ico">
-    <link rel="stylesheet" href="/resources/style/login.css" type="text/css">
+    <link rel="icon" href="../resources/image/favicon.ico" type="image/ico">
+    <link rel="stylesheet" href="../resources/style/login.css" type="text/css">
 </head>
 <body>
 <div class="container">

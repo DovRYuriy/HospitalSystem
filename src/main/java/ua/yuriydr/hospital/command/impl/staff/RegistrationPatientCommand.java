@@ -4,7 +4,7 @@ import org.apache.log4j.Logger;
 import ua.yuriydr.hospital.command.Command;
 import ua.yuriydr.hospital.command.CommandHelper;
 import ua.yuriydr.hospital.dto.IncorrectInputData;
-import ua.yuriydr.hospital.model.*;
+import ua.yuriydr.hospital.entity.*;
 import ua.yuriydr.hospital.service.*;
 import ua.yuriydr.hospital.service.factory.ServiceFactory;
 import ua.yuriydr.hospital.utils.PagesManager;

@@ -3,10 +3,9 @@ package ua.yuriydr.hospital.command.impl.authorization;
 import org.apache.log4j.Logger;
 import ua.yuriydr.hospital.command.Command;
 import ua.yuriydr.hospital.command.CommandHelper;
-import ua.yuriydr.hospital.model.Person;
+import ua.yuriydr.hospital.entity.Person;
 import ua.yuriydr.hospital.service.PersonService;
 import ua.yuriydr.hospital.service.factory.ServiceFactory;
-import ua.yuriydr.hospital.service.factory.impl.PersonServiceImpl;
 import ua.yuriydr.hospital.utils.PagesManager;
 
 import javax.servlet.http.HttpServletRequest;

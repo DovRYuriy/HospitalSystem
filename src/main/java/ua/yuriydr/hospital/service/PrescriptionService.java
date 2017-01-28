@@ -1,6 +1,6 @@
 package ua.yuriydr.hospital.service;
 
-import ua.yuriydr.hospital.model.Prescription;
+import ua.yuriydr.hospital.entity.Prescription;
 
 import java.util.List;
 

@@ -2,8 +2,8 @@ package ua.yuriydr.hospital.dao.mysql.impl;
 
 import org.apache.log4j.Logger;
 import ua.yuriydr.hospital.dao.PersonDao;
-import ua.yuriydr.hospital.model.Person;
-import ua.yuriydr.hospital.model.Role;
+import ua.yuriydr.hospital.entity.Person;
+import ua.yuriydr.hospital.entity.Role;
 import ua.yuriydr.hospital.utils.DatabaseManager;
 
 import java.sql.*;
@@ -103,7 +103,7 @@ public class MySqlPersonDao implements PersonDao {
             person.setRole(role);
             person.setIdChamber(rs.getLong(COLUMN_ID_CHAMBER));
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Person entity create error: " + e);
         }
         return person;
     }
@@ -231,7 +231,7 @@ public class MySqlPersonDao implements PersonDao {
                 logger.debug("Person was not found by this id: " + id);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Find person by id error" + e);
         } finally {
             DatabaseManager.closeAll(connection, statement, rs);
         }

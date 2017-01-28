@@ -4,7 +4,6 @@ import org.apache.log4j.Logger;
 import ua.yuriydr.hospital.command.Command;
 import ua.yuriydr.hospital.command.CommandHelper;
 import ua.yuriydr.hospital.utils.PagesManager;
-import ua.yuriydr.hospital.utils.UserUtils;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;

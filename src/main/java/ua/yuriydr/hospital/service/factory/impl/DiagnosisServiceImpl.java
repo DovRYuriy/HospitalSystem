@@ -2,7 +2,7 @@ package ua.yuriydr.hospital.service.factory.impl;
 
 import ua.yuriydr.hospital.dao.DiagnosisDao;
 import ua.yuriydr.hospital.dao.mysql.MySqlDaoFactory;
-import ua.yuriydr.hospital.model.Diagnosis;
+import ua.yuriydr.hospital.entity.Diagnosis;
 import ua.yuriydr.hospital.service.DiagnosisService;
 
 import java.util.List;
@@ -11,7 +11,7 @@ public class DiagnosisServiceImpl implements DiagnosisService {
 
     private static volatile DiagnosisServiceImpl diagnosisService;
 
-    private static DiagnosisDao diagnosisDao = MySqlDaoFactory.getDiagnosisDao();
+    private static final DiagnosisDao diagnosisDao = MySqlDaoFactory.getDiagnosisDao();
 
     private DiagnosisServiceImpl() {
 

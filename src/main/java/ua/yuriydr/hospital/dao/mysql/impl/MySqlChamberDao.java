@@ -2,8 +2,8 @@ package ua.yuriydr.hospital.dao.mysql.impl;
 
 import org.apache.log4j.Logger;
 import ua.yuriydr.hospital.dao.ChamberDao;
-import ua.yuriydr.hospital.model.Chamber;
-import ua.yuriydr.hospital.model.ChamberType;
+import ua.yuriydr.hospital.entity.Chamber;
+import ua.yuriydr.hospital.entity.ChamberType;
 import ua.yuriydr.hospital.utils.DatabaseManager;
 
 import java.sql.*;
@@ -70,6 +70,7 @@ public class MySqlChamberDao implements ChamberDao {
             ChamberType chamberType = new ChamberType();
             chamberType.setIdChamberType(rs.getLong(COLUMN_FK_CHAMBER_TYPE));
             chamberType.setChamberName(rs.getString(COLUMN_CHAMBER_TYPE_NAME));
+            chamber.setChamberType(chamberType);
         } catch (SQLException e) {
             e.printStackTrace();
             return null;

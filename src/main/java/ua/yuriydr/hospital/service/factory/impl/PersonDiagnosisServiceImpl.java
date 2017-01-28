@@ -3,19 +3,18 @@ package ua.yuriydr.hospital.service.factory.impl;
 import ua.yuriydr.hospital.dao.PersonDao;
 import ua.yuriydr.hospital.dao.PersonDiagnosisDao;
 import ua.yuriydr.hospital.dao.mysql.MySqlDaoFactory;
-import ua.yuriydr.hospital.model.Person;
-import ua.yuriydr.hospital.model.PersonDiagnosis;
+import ua.yuriydr.hospital.entity.Person;
+import ua.yuriydr.hospital.entity.PersonDiagnosis;
 import ua.yuriydr.hospital.service.PersonDiagnosisService;
 
-import java.util.Iterator;
 import java.util.List;
 
 public class PersonDiagnosisServiceImpl implements PersonDiagnosisService {
 
     private static volatile PersonDiagnosisServiceImpl personDiagnosisService;
 
-    private static PersonDao personDao = MySqlDaoFactory.getPersonDao();
-    private static PersonDiagnosisDao personDiagnosisDao = MySqlDaoFactory.getPersonDiagnosisDao();
+    private static final PersonDao personDao = MySqlDaoFactory.getPersonDao();
+    private static final PersonDiagnosisDao personDiagnosisDao = MySqlDaoFactory.getPersonDiagnosisDao();
 
     private PersonDiagnosisServiceImpl() {
 
@@ -97,6 +96,16 @@ public class PersonDiagnosisServiceImpl implements PersonDiagnosisService {
             personDiagnosis.setDoctor(personDao.findPersonById(personDiagnosis.getDoctor().getIdPerson()));
         }
         return personDiagnoses;
+    }
+
+    @Override
+    public PersonDiagnosis findPersonDiagnosis(Long idPatient, Long idStaff, Long idPrescription, Long idDiagnosis) {
+        PersonDiagnosis personDiagnosis = personDiagnosisDao.findPersonDiagnosis(idPatient, idStaff, idPrescription, idDiagnosis);
+        if (personDiagnosis != null) {
+            personDiagnosis.setPatient(personDao.findPersonById(idPatient));
+            personDiagnosis.setDoctor(personDao.findPersonById(idStaff));
+        }
+        return personDiagnosis;
     }
 
     @Override

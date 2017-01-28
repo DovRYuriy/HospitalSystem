@@ -1,4 +1,4 @@
-package ua.yuriydr.hospital.model;
+package ua.yuriydr.hospital.entity;
 
 /**
  * Entity for hospital.diagnosis table.

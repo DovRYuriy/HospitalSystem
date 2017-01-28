@@ -2,9 +2,8 @@ package ua.yuriydr.hospital.command.impl.admin;
 
 import org.apache.log4j.Logger;
 import ua.yuriydr.hospital.command.Command;
-import ua.yuriydr.hospital.command.CommandHelper;
-import ua.yuriydr.hospital.model.Chamber;
-import ua.yuriydr.hospital.model.ChamberType;
+import ua.yuriydr.hospital.entity.Chamber;
+import ua.yuriydr.hospital.entity.ChamberType;
 import ua.yuriydr.hospital.service.ChamberService;
 import ua.yuriydr.hospital.service.factory.ServiceFactory;
 import ua.yuriydr.hospital.utils.PagesManager;

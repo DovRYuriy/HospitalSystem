@@ -3,7 +3,7 @@ package ua.yuriydr.hospital.service.factory.impl;
 
 import ua.yuriydr.hospital.dao.ChamberTypeDao;
 import ua.yuriydr.hospital.dao.mysql.MySqlDaoFactory;
-import ua.yuriydr.hospital.model.ChamberType;
+import ua.yuriydr.hospital.entity.ChamberType;
 import ua.yuriydr.hospital.service.ChamberTypeService;
 
 import java.util.List;
@@ -12,7 +12,7 @@ public class ChamberTypeServiceImpl implements ChamberTypeService{
 
     private static volatile ChamberTypeServiceImpl chamberTypeService;
 
-    private ChamberTypeDao chamberTypeDao = MySqlDaoFactory.getChamberTypeDao();
+    private final ChamberTypeDao chamberTypeDao = MySqlDaoFactory.getChamberTypeDao();
 
     private ChamberTypeServiceImpl(){
 

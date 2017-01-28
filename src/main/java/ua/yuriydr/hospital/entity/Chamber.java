@@ -1,4 +1,4 @@
-package ua.yuriydr.hospital.model;
+package ua.yuriydr.hospital.entity;
 
 import java.util.ArrayList;
 import java.util.List;

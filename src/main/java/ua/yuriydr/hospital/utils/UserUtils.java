@@ -1,7 +1,7 @@
 package ua.yuriydr.hospital.utils;
 
 import org.apache.log4j.Logger;
-import ua.yuriydr.hospital.model.Person;
+import ua.yuriydr.hospital.entity.Person;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;

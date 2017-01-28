@@ -2,7 +2,7 @@ package ua.yuriydr.hospital.service.factory.impl;
 
 import ua.yuriydr.hospital.dao.PersonDao;
 import ua.yuriydr.hospital.dao.mysql.MySqlDaoFactory;
-import ua.yuriydr.hospital.model.Person;
+import ua.yuriydr.hospital.entity.Person;
 import ua.yuriydr.hospital.service.PersonService;
 
 import java.util.List;
@@ -11,7 +11,7 @@ public class PersonServiceImpl implements PersonService {
 
     private static volatile PersonServiceImpl personService;
 
-    private static PersonDao personDao = MySqlDaoFactory.getPersonDao();
+    private static final PersonDao personDao = MySqlDaoFactory.getPersonDao();
 
     private PersonServiceImpl() {
 

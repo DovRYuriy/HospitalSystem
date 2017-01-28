@@ -36,6 +36,11 @@
                 <h3><fmt:message key="message.doctor.patient.service"/>:</h3>
                 <h3>${sessionScope.person.name} ${sessionScope.person.surname}</h3>
                 <h4><fmt:message key="message.chamber"/> № ${sessionScope.chamber.number} </h4>
+                <div>
+                    <c:if test="${not empty sessionScope.errorPD}">
+                        <fmt:message key="message.remove.persondiagnosis.failed"/>
+                    </c:if>
+                </div>
                 <table border="1px">
                     <tr>
                         <th><fmt:message key="message.patient.date"/></th>

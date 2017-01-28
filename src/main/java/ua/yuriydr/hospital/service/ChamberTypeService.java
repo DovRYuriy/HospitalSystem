@@ -1,6 +1,6 @@
 package ua.yuriydr.hospital.service;
 
-import ua.yuriydr.hospital.model.ChamberType;
+import ua.yuriydr.hospital.entity.ChamberType;
 
 import java.util.List;
 

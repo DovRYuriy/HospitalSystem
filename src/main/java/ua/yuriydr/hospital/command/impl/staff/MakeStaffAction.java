@@ -2,12 +2,11 @@ package ua.yuriydr.hospital.command.impl.staff;
 
 import org.apache.log4j.Logger;
 import ua.yuriydr.hospital.command.Command;
-import ua.yuriydr.hospital.model.Person;
-import ua.yuriydr.hospital.model.PersonDiagnosis;
-import ua.yuriydr.hospital.model.Prescription;
+import ua.yuriydr.hospital.entity.Person;
+import ua.yuriydr.hospital.entity.PersonDiagnosis;
+import ua.yuriydr.hospital.entity.Prescription;
 import ua.yuriydr.hospital.service.PrescriptionService;
 import ua.yuriydr.hospital.service.factory.ServiceFactory;
-import ua.yuriydr.hospital.service.factory.impl.PrescriptionServiceImpl;
 import ua.yuriydr.hospital.utils.PagesManager;
 import ua.yuriydr.hospital.utils.UserUtils;
 
